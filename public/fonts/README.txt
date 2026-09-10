@@ -1,0 +1,1 @@
+Clash Display Variable and Switzer Variable by Indian Type Foundry. Downloaded from the official Fontshare API on 2026-09-10. Self-hosted WOFF2. Fontshare fonts: https://www.fontshare.com/fonts/clash-display and https://www.fontshare.com/fonts/switzer. Licence: https://www.fontshare.com/licenses/itf-free-font-license. Original font binaries are unmodified.

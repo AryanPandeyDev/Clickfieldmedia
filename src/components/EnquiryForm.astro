@@ -1,0 +1,19 @@
+---
+import { services } from '../data/site';
+interface Props { id: string; }
+const { id } = Astro.props;
+---
+<form id={id} class="enquiry-form" action="/api/contact.php" method="post" data-enquiry-form>
+  <div class="form-honeypot" aria-hidden="true"><label>Leave empty<input name="website" tabindex="-1" autocomplete="off" /></label></div>
+  <div class="form-grid">
+    <label class="field"><span>Your name</span><input name="name" autocomplete="name" required maxlength="100" placeholder="Full name" /></label>
+    <label class="field"><span>Work email</span><input name="email" type="email" autocomplete="email" required maxlength="200" placeholder="you@company.com" /></label>
+    <label class="field"><span>Phone number</span><input name="phone" type="tel" inputmode="tel" autocomplete="tel" required minlength="7" maxlength="24" pattern="[+0-9() .\-]{7,24}" placeholder="+91" /></label>
+    <label class="field"><span>Company or project</span><input name="company" autocomplete="organization" required maxlength="200" placeholder="Business name" /></label>
+    <label class="field form-wide"><span>What do you need?</span><select name="service" required><option value="" disabled selected>Select a starting point</option>{services.map(service => <option>{service}</option>)}</select></label>
+    <label class="field form-wide"><span>A little about the work <span class="optional">(optional)</span></span><textarea name="message" rows="2" maxlength="1500" placeholder="What would you like to improve or build?"></textarea></label>
+  </div>
+  <p class="form-message" data-form-message role="status" tabindex="-1" hidden></p>
+  <button class="button button-primary form-submit" type="submit"><span data-submit-text>Send enquiry</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 14 0m-5-5 5 5-5 5" /></svg></button>
+  <p class="form-note">We’ll use these details to reply about your enquiry.</p>
+</form>

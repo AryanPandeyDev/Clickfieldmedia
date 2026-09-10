@@ -1,0 +1,96 @@
+---
+import Base from '../layouts/Base.astro';
+import Dashboard from '../components/Dashboard.astro';
+import Software from '../components/Software.astro';
+import EnquiryForm from '../components/EnquiryForm.astro';
+import Testimonials from '../components/Testimonials.astro';
+import { company, faqs } from '../data/site';
+const brands = [
+  ['prestige-group', 'Prestige Group'], ['godrej-properties', 'Godrej Properties'], ['brigade', 'Brigade'],
+  ['sobha', 'Sobha'], ['puravankara', 'Puravankara'], ['lodha', 'Lodha'],
+  ['adarsh-group', 'Adarsh Group'], ['assetz', 'Assetz'], ['lt-realty', 'L&T Realty'],
+  ['nambiar-builders', 'Nambiar Builders'],
+];
+const process = [
+  ['Understand', 'We look at your business, the gaps and what success should mean.'],
+  ['Make a plan', 'Agree the priorities, scope and responsibilities before work begins.'],
+  ['Build & launch', 'Creative, campaigns and software take shape with your feedback.'],
+  ['Improve together', 'Review what people do, listen to your team and refine the work.'],
+];
+const footerGroups = [
+  { title: 'Marketing', links: [['Meta & Google ads', '#marketing'], ['Ad creative', '#marketing'], ['SEO & social', '#marketing'], ['Landing pages', '#software'], ['Tracking & reporting', '#marketing']] },
+  { title: 'Software', links: [['Custom CRMs', '#software', 'crm'], ['Client portals', '#software', 'portal'], ['Websites', '#software', 'build'], ['Custom builds', '#software', 'build'], ['Build & hand over', '#work-together']] },
+  { title: 'Clickfield', links: [['Our process', '#process'], ['Our work', '#results'], ['Client stories', '#testimonials'], ['Ways to work together', '#work-together'], ['Common questions', '#faq']] },
+];
+---
+<Base>
+  <header class="site-header" id="top">
+    <div class="shell nav-shell">
+      <a class="brand-link" href="/" aria-label="Clickfield Media home"><img src="/logo-navy.webp" alt="Clickfield Media" width="528" height="164" fetchpriority="high" /></a>
+      <nav class="desktop-nav" aria-label="Main navigation"><a href="#services">What we do</a><a href="#software">What we build</a><a href="#results">Our work</a></nav>
+      <a class="button button-navy nav-enquiry" href="#contact" data-open-enquiry>Let’s talk <span class="button-dot" aria-hidden="true"></span></a>
+      <button class="menu-toggle" aria-label="Open menu" aria-controls="mobile-menu" aria-expanded="false"><span></span><span></span></button>
+    </div>
+  </header>
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="shell hero-grid">
+        <div class="hero-copy">
+          <p class="hero-label"><span class="paired-mark" aria-hidden="true"><i></i><i></i></span>Marketing + software, built together</p>
+          <h1 id="hero-title">Good marketing.<br />Great<br class="hero-break" /> follow-through.</h1>
+          <p class="hero-description">We bring the right people in, then build the software that helps your team turn interest into business.</p>
+          <div class="hero-actions"><a href="#contact" data-open-enquiry class="button button-primary magnetic">Tell us what you need <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 14 0m-5-5 5 5-5 5" /></svg></a><a href="#results" class="text-link">Explore our work <span aria-hidden="true">↗</span></a></div>
+          <p class="hero-location">From Lucknow. Working across India and beyond.</p>
+        </div>
+        <Dashboard />
+      </div>
+    </section>
+    <section class="clients" aria-labelledby="clients-title">
+      <div class="shell"><h2 id="clients-title">Brands we’ve worked with.</h2></div>
+      <div class="client-window" role="region" tabindex="0" aria-label="Brands we have worked with. The motion pauses while this area is focused.">
+        <div class="client-track">
+          {[0, 1].map(copy => (
+            <ul class="client-group" aria-hidden={copy === 1 ? 'true' : undefined}>
+              {brands.map(([file, name]) => (
+                <li><img src={`/brands/${file}.webp`} alt={copy === 0 ? name : ''} width="220" height="88" loading="eager" decoding="async" /></li>
+              ))}
+            </ul>
+          ))}
+        </div>
+      </div>
+    </section>
+    <section id="services" class="services-section section" aria-labelledby="services-title">
+      <div class="shell">
+        <div class="section-head"><h2 id="services-title">Bring people in.<br />Keep things moving.</h2><p>Good campaigns need somewhere to land.<br />Good software needs people to use it.<br />We build both sides of that connection.</p></div>
+        <div class="service-pair">
+          <article id="marketing" class="service-half marketing-half"><div class="service-top"><span class="service-symbol" aria-hidden="true">↗</span><span>Make the first connection</span></div><h3>Marketing that<br />opens the door.</h3><p>Reach people who have a reason to choose you.</p><ul><li><span>Meta & Google ads</span><small>Put your offer in front of the right people.</small></li><li><span>Creative, SEO & social</span><small>Give people a reason to pay attention.</small></li><li><span>Landing pages & tracking</span><small>Turn interest into an enquiry you can measure.</small></li></ul></article>
+          <article class="service-half software-half"><div class="service-top"><span class="service-symbol" aria-hidden="true">↳</span><span>Make the next step easier</span></div><h3>Software that<br />picks things up.</h3><p>Give your team a clear way to act on that interest.</p><ul><li><span>Custom CRMs</span><small>Keep enquiries, owners and next steps together.</small></li><li><span>Client portals</span><small>Share work, updates and approvals in one place.</small></li><li><span>Websites & custom builds</span><small>Tools that work the way your business does.</small></li></ul></article>
+        </div>
+        <div class="connection-note"><span class="connection-line" aria-hidden="true"></span><p>One connected journey. From your next customer’s first click.</p></div>
+      </div>
+    </section>
+    <Software />
+    <section id="process" class="process-section section" aria-labelledby="process-title">
+      <div class="shell"><div class="section-head"><h2 id="process-title">Clear steps.<br />Shared progress.</h2><p>You know what’s happening, who’s doing it and what comes next.</p></div><ol class="process-list">{process.map(([title, body], i) => <li><div class="process-number"><span>{String(i + 1).padStart(2, '0')}</span><i aria-hidden="true"></i></div><h3>{title}</h3><p>{body}</p></li>)}</ol></div>
+    </section>
+    <section id="results" class="results-section section" aria-labelledby="results-title">
+      <div class="shell">
+        <div class="section-head"><div><span class="section-tag tag-coral">Where we’ve put it to work</span><h2 id="results-title">Built in a market<br />that makes you prove it.</h2></div><div><p>Real estate is where we built our track record. Long decisions, considered purchases and results that have to reach the sales team.</p><a class="text-link" href={company.realEstate} target="_blank" rel="noopener noreferrer">Our real estate practice <span aria-hidden="true">↗</span></a></div></div>
+        <div class="case-grid">
+          <article class="case"><div class="case-context"><span>Residential project</span><span>Bengaluru</span></div><div class="case-result"><strong>28<span>%</span></strong><p>lower cost per<br />qualified enquiry</p></div><h3>A better fit, before the form fill.</h3><p>Sharper buyer targeting, specific creative and better form questions helped the client’s team spend time on more relevant enquiries.</p><div class="case-method"><span>Meta ads</span><span>Creative</span><span>Form testing</span></div></article>
+          <article class="case"><div class="case-context"><span>Premium development</span><span>Lucknow</span></div><div class="case-result"><strong>86</strong><p>qualified enquiries<br />in one month</p></div><h3>The right search. A clearer next step.</h3><p>Location-led Google campaigns and a dedicated landing page gave interested buyers the details they needed to get in touch.</p><div class="case-method"><span>Google ads</span><span>Landing page</span><span>Tracking</span></div></article>
+        </div>
+      </div>
+    </section>
+    <section id="testimonials" class="testimonials-section section" aria-labelledby="testimonials-title">
+      <div class="shell"><h2 id="testimonials-title">What the work changes.</h2></div><Testimonials />
+    </section>
+    <section id="work-together" class="engagement-section section" aria-labelledby="engagement-title"><div class="shell engagement-grid"><div><span class="section-tag tag-amber">A shape that fits the work</span><h2 id="engagement-title">Start where<br />you need us.</h2><p class="section-intro">An ongoing team, a defined project or a build you take forward yourself.</p><a href="#contact" data-open-enquiry class="text-link">Find the right fit <span aria-hidden="true">↗</span></a></div><div class="engagement-list"><a href="#contact" data-open-enquiry data-service="Marketing"><div><h3>Monthly retainer</h3><p>Ongoing marketing, testing and improvements.</p></div><span aria-hidden="true">↗</span></a><a href="#contact" data-open-enquiry data-service="Software"><div><h3>Fixed-scope project</h3><p>A clear brief, agreed deliverables and a defined finish.</p></div><span aria-hidden="true">↗</span></a><a href="#contact" data-open-enquiry data-service="Software"><div><h3>Build and hand over</h3><p>Software, documentation and the keys to run it.</p></div><span aria-hidden="true">↗</span></a></div></div></section>
+    <section id="faq" class="faq-section section" aria-labelledby="faq-title"><div class="shell faq-grid"><div><h2 id="faq-title">A few things<br />you might ask.</h2><a class="text-link" href={`mailto:${company.email}`}>Ask us something else <span aria-hidden="true">↗</span></a></div><div class="faq-list">{faqs.map((faq, i) => <details open={i === 0}><summary>{faq.q}<span aria-hidden="true"></span></summary><p>{faq.a}</p></details>)}</div></div></section>
+    <section id="contact" class="contact-section section" aria-labelledby="contact-title"><div class="shell contact-grid"><div class="contact-copy"><span class="section-tag tag-amber">Let’s make it work</span><h2 id="contact-title">What’s the<br />next thing<br /> you want to build?</h2><p>Tell us what’s working, what isn’t, and where you want to go. We’ll take it from there.</p><div class="contact-direct"><a href={`mailto:${company.email}`}>{company.email}</a><a href={`tel:${company.telephone}`}>{company.phone}</a></div><address class="contact-address"><span class="contact-address-label">Our office</span><a href={company.map} target="_blank" rel="noopener noreferrer">3/245, Vijayant Khand<br />Gomti Nagar, Lucknow 226010<br />Uttar Pradesh, India</a><span class="contact-address-note">Behind Chandan Hospital</span></address><p class="contact-chai">Around Lucknow? Come by for chai.<br />Coffee works too.</p></div><div class="contact-form-panel"><h3>Tell us a little about it.</h3><EnquiryForm id="contact-form" /></div></div></section>
+  </main>
+  <footer class="site-footer"><div class="shell"><div class="footer-grid"><div class="footer-brand"><a href="#top" aria-label="Back to top"><img src="/logo-white.webp" alt="Clickfield Media" width="898" height="278" loading="lazy" /></a><p>Digital marketing and software.<br />Better when they work together.</p><address><a href={company.map} target="_blank" rel="noopener noreferrer">3/245, Vijayant Khand<br />Gomti Nagar, Lucknow 226010</a><span>Behind Chandan Hospital</span></address></div>{footerGroups.map(group => <nav aria-label={group.title}><h2>{group.title}</h2><ul>{group.links.map(([label, href, product]) => <li><a href={href} data-select-product={product}>{label}</a></li>)}</ul></nav>)}<nav aria-label="Elsewhere"><h2>Stay in touch</h2><ul><li><a href="https://www.instagram.com/clickfield_media/" target="_blank" rel="noopener noreferrer">Instagram</a></li><li><a href="https://www.linkedin.com/company/clickfield-media/" target="_blank" rel="noopener noreferrer">LinkedIn</a></li><li><a href="https://www.facebook.com/clickfieldmedia/" target="_blank" rel="noopener noreferrer">Facebook</a></li><li><a href="https://wa.me/916393735033" target="_blank" rel="noopener noreferrer">WhatsApp</a></li><li><a href={company.realEstate} target="_blank" rel="noopener noreferrer">Real estate practice ↗</a></li></ul></nav></div><div class="footer-bottom"><p>© {new Date().getFullYear()} Clickfield Media</p><span>Based in Lucknow. Working beyond it.</span><a class="back-top" href="#top">Back to top <span aria-hidden="true">↑</span></a></div></div></footer>
+  <dialog id="enquiry-modal" aria-labelledby="enquiry-title" class="enquiry-modal" data-lenis-prevent><div class="modal-card"><button class="close-button" data-close-enquiry aria-label="Close enquiry form"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6" /></svg></button><span class="section-tag tag-amber">A good place to start</span><h2 id="enquiry-title">What do you have in mind?</h2><p>Tell us a little. We’ll get back to you.</p><EnquiryForm id="modal-form" /></div></dialog>
+  <dialog id="mobile-menu" class="mobile-menu" aria-labelledby="menu-title" data-lenis-prevent><div class="mobile-menu-head"><img src="/logo-navy.webp" alt="Clickfield Media" width="528" height="164" /><button class="close-button" data-close-menu aria-label="Close menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6" /></svg></button></div><h2 id="menu-title" class="sr-only">Navigation</h2><nav aria-label="Mobile navigation"><a href="#services">What we do</a><a href="#software">What we build</a><a href="#process">How we work</a><a href="#results">Our work</a><a href="#faq">Your questions</a><a href="#contact" class="button button-primary">Let’s talk</a></nav><p>From Lucknow.<br />For what comes next.</p></dialog>
+  <script>import '../scripts/site';</script>
+</Base>

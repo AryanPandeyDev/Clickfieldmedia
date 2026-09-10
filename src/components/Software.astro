@@ -1,0 +1,46 @@
+---
+const products = [
+  { id: 'crm', name: 'Custom CRMs', line: 'One place for every enquiry, owner and next step.' },
+  { id: 'portal', name: 'Client portals', line: 'Give clients a clear view of their work with you.' },
+  { id: 'build', name: 'Websites & custom builds', line: 'Pages and tools shaped around your business.' },
+];
+---
+<section id="software" class="software-section section" aria-labelledby="software-title">
+  <div class="shell software-grid">
+    <div class="software-copy">
+      <span class="section-tag tag-plum">The software side</span>
+      <h2 id="software-title">Made for the way<br class="desktop-break" /> your team works.</h2>
+      <p class="section-intro">Your process shouldn’t have to fit someone else’s software. We build around the people who use it.</p>
+      <div class="product-options" role="tablist" aria-label="Software examples" aria-orientation="vertical">
+        <span class="option-highlight" aria-hidden="true"></span>
+        {products.map((product, i) => <button role="tab" id={`tab-${product.id}`} aria-controls={`panel-${product.id}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1} data-product={product.id}><span>{product.name}</span><small>{product.line}</small><span class="product-arrow" aria-hidden="true">↗</span></button>)}
+      </div>
+      <p class="ownership-note">Built with you. Documented. Yours to run.</p>
+    </div>
+    <div class="software-preview">
+      <div id="panel-crm" role="tabpanel" aria-labelledby="tab-crm" tabindex="0" class="product-panel">
+        <div class="workspace-heading"><span class="workspace-mark" aria-hidden="true">P</span><div><strong>Project workspace</strong><span>Sales pipeline</span></div><span class="workspace-initial" aria-hidden="true">AS</span></div>
+        <div class="pipeline-heading"><h3>A place for every next step.</h3><span>Board view</span></div>
+        <div class="pipeline-board">
+          <div class="board-column"><div class="board-label"><i class="stage-new"></i>New enquiry</div><article class="pipeline-card"><span class="mini-source">Google Ads</span><h4>Riya Sharma</h4><p>Interested in a site visit</p><div><span>Assigned to Ankit</span><b>RS</b></div></article><article class="pipeline-card secondary-card"><span class="mini-source">Website</span><h4>Kabir Shah</h4><p>Asked for project details</p><div><span>Assigned to Neha</span><b>KS</b></div></article></div>
+          <div class="board-column"><div class="board-label"><i class="stage-progress"></i>In progress</div><article class="pipeline-card"><span class="mini-source source-plum">Meta Ads</span><h4>Aditya Rao</h4><p>Details shared by your team</p><div><span>Follow-up scheduled</span><b>AR</b></div></article><div class="board-add">Every lead has an owner.</div></div>
+        </div>
+        <div class="workspace-footer"><span class="integration-indicator"></span>Forms, campaigns and your sales team. Connected.</div>
+      </div>
+      <div id="panel-portal" role="tabpanel" aria-labelledby="tab-portal" tabindex="0" class="product-panel" hidden>
+        <div class="workspace-heading"><span class="workspace-mark" aria-hidden="true">P</span><div><strong>Client workspace</strong><span>Everything in one place</span></div><span class="workspace-initial" aria-hidden="true">AV</span></div>
+        <div class="pipeline-heading"><h3>Less chasing. More clarity.</h3><span>Project overview</span></div>
+        <div class="portal-welcome"><p>Your campaign launch</p><strong>Ready for your review</strong><span>Check the creative, leave feedback and keep work moving.</span></div>
+        <div class="portal-row"><span>Campaign creative</span><b class="review-status">Review needed</b></div><div class="portal-row"><span>Landing page</span><b class="approved-status">Approved</b></div><div class="portal-row"><span>Monthly report</span><b>Available</b></div>
+        <div class="workspace-footer">Files, approvals and updates in your client’s own space.</div>
+      </div>
+      <div id="panel-build" role="tabpanel" aria-labelledby="tab-build" tabindex="0" class="product-panel" hidden>
+        <div class="workspace-heading"><span class="workspace-mark" aria-hidden="true">P</span><div><strong>Project website</strong><span>From interest to enquiry</span></div><span class="workspace-initial" aria-hidden="true">CM</span></div>
+        <div class="pipeline-heading"><h3>A shorter path to an enquiry.</h3><span>Connected website</span></div>
+        <div class="build-preview"><div><span class="build-label">A home in your neighbourhood.</span><strong>Room for what’s next.</strong><span>Project details, plans and a clear way to get in touch.</span><span class="build-faux-button">Request project details</span></div><div class="floorplan" aria-hidden="true"><span>Living</span><span>Bedroom</span><span>Kitchen</span><span>Study</span></div></div>
+        <div class="build-connection"><span>Website enquiry</span><i aria-hidden="true"></i><span>Your CRM</span></div>
+        <div class="workspace-footer">Fast pages and useful tools, connected to your business.</div>
+      </div>
+    </div>
+  </div>
+</section>

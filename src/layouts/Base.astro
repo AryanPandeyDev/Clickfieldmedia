@@ -1,0 +1,56 @@
+---
+import '../styles/global.css';
+import { company, faqs } from '../data/site';
+import Cursor from '../components/Cursor.astro';
+interface Props { title?: string; description?: string; faqSchema?: boolean; noindex?: boolean; }
+const { title = 'Digital marketing & custom software | Clickfield Media', description = 'Marketing that brings people in. Software that helps your team follow through. Ads, creative, SEO, CRMs and portals, built in Lucknow for businesses across India.', faqSchema = true, noindex = false } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const origin = Astro.site!.href.replace(/\/$/, '');
+const schema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    { '@type': ['Organization', 'ProfessionalService'], '@id': `${origin}/#organization`, name: company.name, url: origin, description, email: company.email, telephone: company.telephone,
+      logo: { '@type': 'ImageObject', url: `${origin}/logo-navy.png`, width: 528, height: 164 },
+      address: { '@type': 'PostalAddress', streetAddress: '3/245, Vijayant Khand, Gomti Nagar (behind Chandan Hospital)', addressLocality: 'Lucknow', addressRegion: 'Uttar Pradesh', postalCode: '226010', addressCountry: 'IN' },
+      areaServed: [{ '@type': 'City', name: 'Lucknow' }, { '@type': 'City', name: 'Bengaluru' }, { '@type': 'Country', name: 'India' }, 'Worldwide'],
+      sameAs: ['https://www.instagram.com/clickfield_media/', 'https://www.facebook.com/clickfieldmedia/', 'https://www.linkedin.com/company/clickfield-media/'],
+      hasOfferCatalog: { '@type': 'OfferCatalog', name: 'Marketing and software', itemListElement: ['Digital marketing', 'Meta and Google advertising', 'SEO and creative', 'Landing page development', 'Custom CRM development', 'Client portals and custom software'].map(name => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name } })) },
+    },
+    { '@type': 'WebSite', '@id': `${origin}/#website`, url: origin, name: company.name, inLanguage: 'en-IN' },
+    ...(faqSchema ? [{ '@type': 'FAQPage', '@id': `${canonical}#faq`, mainEntity: faqs.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) }] : []),
+  ],
+};
+---
+<!doctype html>
+<html lang="en-IN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#eee9e1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="robots" content={noindex ? 'noindex, follow' : 'index, follow'} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="preload" href="/fonts/ClashDisplay-Variable.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/Switzer-Variable.woff2" as="font" type="font/woff2" crossorigin />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_IN" />
+    <meta property="og:site_name" content={company.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={`${origin}/logo-navy.png`} />
+    <meta property="og:image:alt" content="Clickfield Media" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={`${origin}/logo-navy.png`} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(schema).replace(/</g, '\\u003c')} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <slot />
+    <Cursor />
+  </body>
+</html>

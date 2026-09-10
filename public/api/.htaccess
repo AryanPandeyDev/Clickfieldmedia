@@ -1,0 +1,38 @@
+# Rules for the enquiry API. Only contact.php is meant to be reachable from
+# the web; everything else in here is included by it, never requested.
+
+# --- Never cache an API reply -------------------------------------------
+# The site-wide .htaccess sets ExpiresDefault to a month, and application/json
+# is not in its ExpiresByType list, so without this block every response here
+# goes out as "public, max-age=2592000". A CDN or proxy is then entitled to
+# store one visitor's reply and hand it to the next person who submits.
+<IfModule mod_expires.c>
+  ExpiresActive Off
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header always set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+  Header always set Pragma "no-cache"
+  Header always unset Expires
+  Header always set Expires "0"
+  Header always set X-Robots-Tag "noindex, nofollow"
+  Header always unset X-Powered-By
+</IfModule>
+
+# --- Only the endpoint is public ----------------------------------------
+# config.php holds the destination address, bootstrap.php and lib/ hold the
+# logic. Apache would run them as empty pages rather than leaking source, but
+# there is no reason for them to answer a request at all.
+<FilesMatch "^(config|bootstrap)\.php$">
+  Require all denied
+</FilesMatch>
+
+# --- Nothing under lib/ or storage/ is fetchable -------------------------
+RedirectMatch 404 ^/api/(lib|storage)/
+
+<FilesMatch "\.(csv|log|json|md|bak|1)$">
+  Require all denied
+</FilesMatch>
+
+# Directory listings would reveal the structure even where files are denied.
+Options -Indexes
