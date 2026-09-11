@@ -92,8 +92,37 @@ import { testimonials } from '../data/site';
       layout();
     };
 
+    // On phones the deck steps itself one card at a time, forever, using the
+    // same move as the buttons. It only runs while the deck is on screen, and
+    // never for visitors who have asked for reduced motion (they keep the
+    // buttons instead — see the matching media query in global.css).
+    const autoQuery = window.matchMedia('(max-width: 639px) and (prefers-reduced-motion: no-preference)');
+    let onScreen = false;
+    let timer: number | undefined;
+
+    const stopAuto = () => {
+      window.clearInterval(timer);
+      timer = undefined;
+    };
+    const startAuto = () => {
+      stopAuto();
+      if (autoQuery.matches && onScreen && !document.hidden) {
+        timer = window.setInterval(() => move(1), 3000);
+      }
+    };
+
+    new IntersectionObserver(([entry]) => {
+      onScreen = entry.isIntersecting;
+      startAuto();
+    }).observe(root);
+    autoQuery.addEventListener('change', startAuto);
+    document.addEventListener('visibilitychange', startAuto);
+
     cards.forEach(card => {
       card.addEventListener('click', () => {
+        // On phones the cards can't be tapped (see global.css); this guard
+        // backs that up in case a click still reaches one.
+        if (!sizeQuery.matches) return;
         const index = order.indexOf(card);
         const count = order.length;
         move(count % 2 ? index - (count + 1) / 2 : index - count / 2);

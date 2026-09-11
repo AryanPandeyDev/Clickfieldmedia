@@ -1,4 +1,62 @@
 ---
 import Base from '../layouts/Base.astro';
+import { company } from '../data/site';
+import '../styles/thank-you.css';
 ---
-<Base title="Enquiry received | Clickfield Media" faqSchema={false} noindex><main id="main" class="thank-you shell"><img src="/logo-navy.webp" alt="Clickfield Media" width="528" height="164" /><h1>We have your enquiry.</h1><p>We’ll review your details and get back to you about the work.</p><a class="button button-primary" href="/">Back to the website</a></main></Base>
+<Base title="Enquiry received | Clickfield Media" faqSchema={false} noindex>
+  <header class="thank-you-header">
+    <div class="shell thank-you-nav">
+      <a class="thank-you-brand" href="/" aria-label="Clickfield Media home">
+        <img src="/logo-navy.webp" alt="Clickfield Media" width="528" height="164" />
+      </a>
+      <nav class="thank-you-nav-links" aria-label="Main navigation">
+        <a class="thank-you-nav-secondary" href="/#services">What we do</a>
+        <a class="thank-you-nav-secondary" href="/#results">Our work</a>
+        <a class="thank-you-back" href="/"><span aria-hidden="true">←</span> Back to website</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="thank-you-page">
+    <div class="shell thank-you-layout">
+      <div class="thank-you-scroll">
+        <div class="thank-you-curl thank-you-curl-top" aria-hidden="true"></div>
+        <article class="thank-you-paper" aria-labelledby="thank-you-title">
+          <div class="thank-you-paper-content">
+            <div class="thank-you-confirmation-mark" aria-hidden="true">
+              <svg viewBox="0 0 32 32" fill="none"><path d="m9 16 5 5 10-11" /></svg>
+            </div>
+            <p class="thank-you-received">Enquiry received</p>
+            <h1 id="thank-you-title">Thank you!</h1>
+            <p class="thank-you-lede">We’re glad you reached out. We’ll review your details and get back to you with a useful next step.</p>
+            <div class="thank-you-paper-signoff">
+              <span>Speak soon,</span>
+              <strong>The Clickfield team</strong>
+            </div>
+            <div class="thank-you-contact">
+              <p>Something to add?</p>
+              <div class="thank-you-contact-links">
+                <a href={`mailto:${company.email}`}>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 6 9 7 9-7" /></svg>
+                  Email us
+                </a>
+                <span class="thank-you-contact-divider" aria-hidden="true"></span>
+                <a href={`tel:${company.telephone}`}>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3H4a1 1 0 0 0-1 1c0 9.4 7.6 17 17 17a1 1 0 0 0 1-1v-3l-5-2-2 2a14 14 0 0 1-7-7l2-2-2-5Z" /></svg>
+                  Call us
+                </a>
+              </div>
+            </div>
+          </div>
+        </article>
+        <div class="thank-you-curl thank-you-curl-bottom" aria-hidden="true"></div>
+      </div>
+    </div>
+  </main>
+  <footer class="thank-you-footer">
+    <div class="shell thank-you-footer-inner">
+      <p>Clickfield Media</p>
+      <p>Marketing + software. Built together.</p>
+    </div>
+  </footer>
+</Base>

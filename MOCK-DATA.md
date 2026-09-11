@@ -4,10 +4,11 @@ Built from the September 2026 brief and the sister project at `C:/Projects/reale
 
 ## Illustrative data, as requested
 
-- Hero dashboard: all names, masked phones, sources, statuses, metrics, sparklines and charts. Six simulated incoming leads change 24 new leads to 30, then stop. These are not customer records or live analytics.
+- Hero signal tuner: an interactive metaphor for audience fit. Its waveform, meter and audience stages are illustrative; they do not represent analytics, customer records or a measured conversion forecast. It replaces the earlier pipeline dashboard.
 - Software previews: all client names, workflow examples, project states and page content.
 - Bengaluru case: 28% lower cost per qualified enquiry; illustrative targeting, creative and form-testing narrative based on the sister site's mock case.
 - Lucknow case: 86 qualified enquiries in one month, taken from the sister site's MOCK-DATA.md. Its component currently says 860; the documented, more modest figure was chosen intentionally. Search and landing-page narrative is illustrative.
+- Site visit case: 24 site visits from ₹1.5 lakh ad spend, supplied by Aryan. The context labels ("Site visit campaign", "Multi-platform"), headline and method tags were written to fit; project type and city are still to be confirmed.
 - Testimonials: all ten entries in `src/data/site.ts` are invented. Ananya Verma of Vistara Developers and Imran Qureshi of Qureshi Estates are copied from the sister site's `src/data/testimonials.ts`, which explicitly labels them as invented; the other eight (Rohit Malviya, Priya Nair, Deepak Chaturvedi, Sneha Kulkarni, Faisal Ahmed, Kavita Rao, Arun Sethi and Meera Joshi) were written to fill the testimonial deck and are equally invented. None are verified endorsements, none are associated with the client logos in the marquee, and every one of them must be replaced with a real, permissioned quote before launch.
 
 Replace the case claims and quotes with approved evidence before a public launch. The build brief explicitly requested confident modest mock figures without draft labels on the page; caveats are recorded here instead.

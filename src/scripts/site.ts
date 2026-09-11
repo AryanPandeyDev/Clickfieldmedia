@@ -1,49 +1,76 @@
 import Lenis from 'lenis';
-let gsap: typeof import('gsap').gsap | undefined;
+import { initSignalTuner } from './signal-tuner';
+import { initResultsCounters } from './results-counters';
 
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 const fine = window.matchMedia('(hover: hover) and (pointer: fine)');
-const tablet = document.querySelector<HTMLElement>('[data-dashboard]');
+const hero = document.querySelector<HTMLElement>('.hero-signal');
+const heroObject = document.querySelector<HTMLElement>('[data-hero-object]');
+const heroCopy = hero?.querySelector<HTMLElement>('.hero-copy');
 const modal = document.querySelector<HTMLDialogElement>('#enquiry-modal')!;
+const header = document.querySelector<HTMLElement>('.site-header')!;
 const menu = document.querySelector<HTMLDialogElement>('#mobile-menu')!;
 const menuButton = document.querySelector<HTMLButtonElement>('.menu-toggle')!;
 let lastFocus: HTMLElement | null = null;
 let lockedScroll = 0;
 let lenis: Lenis | null = null;
 let scrollFrame = 0;
-let tabletVisible = true;
+let heroVisible = true;
+let scrollClock = 0;
+let lastFrameTime = 0;
+let heroDistance = 800;
 
 // Lenis is driven only while the visitor is scrolling. No persistent ticker.
 function stopScrollFrame() {
   cancelAnimationFrame(scrollFrame);
   scrollFrame = 0;
+  lastFrameTime = 0;
+}
+function positionHero() {
+  if (!heroObject || !heroCopy || !heroVisible || document.hidden || modal.open || menu.open) return;
+  const progress = reduced.matches ? 0 : Math.max(0, Math.min(1, window.scrollY / heroDistance));
+  // Two flat layers, 42px/12px maximum desktop displacement; 14px on touch.
+  heroObject.style.transform = `translate3d(0,${(progress * (fine.matches ? 42 : 14)).toFixed(2)}px,0)`;
+  heroCopy.style.transform = `translate3d(0,${(progress * (fine.matches ? -12 : 0)).toFixed(2)}px,0)`;
 }
 function scrollTick(time: number) {
   scrollFrame = 0;
-  if (!lenis || document.hidden || modal.open || menu.open) return;
-  lenis.raf(time);
-  if (lenis.isScrolling === 'smooth') scrollFrame = requestAnimationFrame(scrollTick);
+  if (document.hidden || reduced.matches || modal.open || menu.open) { lastFrameTime = 0; return; }
+  // Lenis receives elapsed *active* time. Passing wall time after an idle pause
+  // makes its first frame finish the entire scroll and was the old jump bug.
+  scrollClock += lastFrameTime ? Math.min(50, time - lastFrameTime) : 16.667;
+  lastFrameTime = time;
+  lenis?.raf(scrollClock);
+  positionHero();
+  if (lenis?.isScrolling === 'smooth') scrollFrame = requestAnimationFrame(scrollTick);
+  else lastFrameTime = 0;
 }
 function startScrollFrame() {
-  if (!scrollFrame && lenis && !document.hidden) scrollFrame = requestAnimationFrame(scrollTick);
+  if (!scrollFrame && !document.hidden && !reduced.matches && !modal.open && !menu.open) scrollFrame = requestAnimationFrame(scrollTick);
 }
 function configureScroll() {
   stopScrollFrame();
   lenis?.destroy();
   lenis = null;
+  scrollClock = 0;
   if (!reduced.matches && fine.matches) {
-    lenis = new Lenis({ autoRaf: false, duration: .8, smoothWheel: true, syncTouch: false });
+    lenis = new Lenis({ autoRaf: false, lerp: .085, smoothWheel: true, syncTouch: false, wheelMultiplier: .95 });
+    lenis.on('virtual-scroll', () => queueMicrotask(startScrollFrame));
   }
+  positionHero();
 }
 configureScroll();
-window.addEventListener('wheel', startScrollFrame, { passive: true });
+window.addEventListener('scroll', () => {
+  if (heroVisible || lenis?.isScrolling === 'smooth') startScrollFrame();
+}, { passive: true });
 
 function goTo(target: HTMLElement) {
   if (lenis && !reduced.matches) {
-    lenis.scrollTo(target, { offset: -30 });
+    // Lenis reads the same CSS scroll margin/padding as native navigation.
+    lenis.scrollTo(target, { duration: 1.25, easing: t => 1 - Math.pow(1-t, 4), lerp: 0 });
     startScrollFrame();
   } else {
-    target.scrollIntoView({ behavior: reduced.matches || !fine.matches ? 'instant' : 'smooth' });
+    target.scrollIntoView({ behavior: reduced.matches ? 'instant' : 'smooth' });
   }
 }
 
@@ -56,17 +83,20 @@ function lockPage() {
   document.body.style.top = `-${lockedScroll}px`;
   document.body.style.width = '100%';
   document.body.style.paddingRight = `${scrollbar}px`;
-  syncDashboard();
+  // The pinned header spans the viewport, which widens when the scrollbar goes; keep it still.
+  header.style.paddingRight = `${scrollbar}px`;
+  syncMotionState();
 }
 function unlockPage() {
   document.body.style.position = '';
   document.body.style.top = '';
   document.body.style.width = '';
   document.body.style.paddingRight = '';
+  header.style.paddingRight = '';
   window.scrollTo({ top: lockedScroll, behavior: 'instant' });
   lenis?.start();
   lastFocus?.focus({ preventScroll: true });
-  syncDashboard();
+  syncMotionState();
 }
 function openEnquiry(trigger: HTMLElement) {
   if (menu.open) menu.close();
@@ -158,112 +188,40 @@ const tabResize = new ResizeObserver(() => positionHighlight(tabs.find(t => t.ge
 if (tabs[0]) tabResize.observe(tabs[0].parentElement!);
 document.querySelectorAll<HTMLElement>('[data-select-product]').forEach(link => link.addEventListener('click', () => selectProduct(link.dataset.selectProduct!)));
 
-// Finite content changes. A fixed pool of rows moves exclusively by transform.
-// Nothing is inserted into layout and all data is populated in the server HTML.
-const rows = tablet ? [...tablet.querySelectorAll<HTMLElement>('[data-lead-row]')] : [];
-const arrivals = [
-  ['Meera Joshi', 'M', '+91 •••• 9284', 'Meta'],
-  ['Arjun Singh', 'A', '+91 •••• 7513', 'Google'],
-  ['Isha Gupta', 'I', '+91 •••• 3067', 'Website'],
-  ['Dev Malhotra', 'D', '+91 •••• 8142', 'Google'],
-  ['Sara Khan', 'S', '+91 •••• 5726', 'Meta'],
-  ['Vivek Nair', 'V', '+91 •••• 6908', 'Website'],
-];
-let arrivalIndex = 0;
-let leadTimer: ReturnType<typeof setTimeout> | undefined;
-let tintTimer: ReturnType<typeof setTimeout> | undefined;
-let manuallyPaused = false;
-let rowOrder = [...rows];
-const pauseButton = document.querySelector<HTMLButtonElement>('[data-toggle-dashboard]')!;
-function canUpdate() { return tabletVisible && !document.hidden && !reduced.matches && !manuallyPaused && !modal.open && !menu.open && arrivalIndex < arrivals.length; }
-function settleRows() {
-  gsap?.killTweensOf(rows);
-  rowOrder.forEach((row, i) => {
-    row.style.transform = `translateY(${i * 100}%)`;
-    row.classList.remove('is-new');
+// Scroll and motion lifecycle share visibility, dialogs and reduced-motion state.
+function syncMotionState() {
+  document.dispatchEvent(new Event('clickfield:motion-state'));
+}
+if (hero) {
+  const heroObserver = new IntersectionObserver(([entry]) => {
+    heroVisible = entry.isIntersecting;
+    const promote = heroVisible && !reduced.matches ? 'transform' : 'auto';
+    if (heroObject) heroObject.style.willChange = promote;
+    if (heroCopy) heroCopy.style.willChange = promote;
+    if (heroVisible) positionHero();
   });
-  gsap?.ticker.sleep();
+  heroObserver.observe(hero);
+  new ResizeObserver(() => {
+    heroDistance = hero.offsetTop + hero.offsetHeight;
+    positionHero();
+  }).observe(hero);
 }
-async function nextLead() {
-  leadTimer = undefined;
-  if (!canUpdate()) return;
-  // The animation engine is not part of the initial download or reduced-motion path.
-  const engine = gsap ??= (await import('gsap')).gsap;
-  engine.config({ autoSleep: 1 });
-  if (!canUpdate()) { engine.ticker.sleep(); return; }
-  const [name, initial, phone, source] = arrivals[arrivalIndex];
-  const recycled = rowOrder.pop()!;
-  recycled.querySelector('.lead-avatar')!.textContent = initial;
-  recycled.querySelector('.lead-person b')!.textContent = name;
-  recycled.querySelector('.lead-person>span')!.textContent = phone;
-  recycled.querySelector('.lead-source')!.textContent = source;
-  const status = recycled.querySelector('.lead-status')!;
-  status.textContent = 'New';
-  status.classList.remove('assigned');
-  recycled.classList.add('is-new');
-  // Set the recycled row above the clipped viewport, then translate the pool.
-  engine.set(recycled, { y: 0, yPercent: -100 });
-  rowOrder.unshift(recycled);
-  arrivalIndex++;
-  tablet!.dataset.arrivals = String(arrivalIndex);
-  tablet!.querySelector('[data-lead-count]')!.textContent = String(24 + arrivalIndex);
-  rowOrder.forEach((row, i) => engine.to(row, { y: 0, yPercent: i * 100, duration: .52, ease: 'power2.out', overwrite: true, onComplete: i === rowOrder.length - 1 ? () => engine.ticker.sleep() : undefined }));
-  tintTimer = setTimeout(() => { recycled.classList.remove('is-new'); tintTimer = undefined; }, 1600);
-  updatePauseLabel();
-  if (canUpdate()) leadTimer = setTimeout(nextLead, 4700);
-}
-function updatePauseLabel() {
-  if (reduced.matches) {
-    pauseButton.hidden = true;
-  } else {
-    pauseButton.hidden = false;
-    pauseButton.textContent = arrivalIndex >= arrivals.length ? 'Replay ↻' : manuallyPaused ? 'Play ▷' : 'Pause Ⅱ';
-    pauseButton.setAttribute('aria-label', arrivalIndex >= arrivals.length ? 'Replay dashboard updates' : manuallyPaused ? 'Resume dashboard updates' : 'Pause dashboard updates');
-  }
-}
-function syncDashboard() {
-  clearTimeout(leadTimer);
-  clearTimeout(tintTimer);
-  leadTimer = undefined;
-  tintTimer = undefined;
-  if (canUpdate()) leadTimer = setTimeout(nextLead, 4700);
-  else settleRows();
-  updatePauseLabel();
-}
-pauseButton.addEventListener('click', () => {
-  if (arrivalIndex >= arrivals.length) { arrivalIndex = 0; manuallyPaused = false; tablet!.dataset.arrivals = '0'; tablet!.querySelector('[data-lead-count]')!.textContent = '24'; }
-  else manuallyPaused = !manuallyPaused;
-  syncDashboard();
-});
-if (tablet) {
-  const observer = new IntersectionObserver(([entry]) => {
-    tabletVisible = entry.isIntersecting && entry.intersectionRatio >= .2;
-    syncDashboard();
-  }, { threshold: [0, .2] });
-  observer.observe(tablet);
-}
-
-// The tablet follows current scroll position with no easing or trailing loop.
-function positionTablet() {
-  if (!tablet || !tabletVisible || reduced.matches || modal.open || menu.open) return;
-  const angle = fine.matches ? Math.min(1.5, window.scrollY / 230) : 0;
-  tablet.style.transform = `rotate(${angle}deg)`;
-}
-window.addEventListener('scroll', positionTablet, { passive: true });
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) { stopScrollFrame(); lenis?.stop(); }
-  else lenis?.start();
-  syncDashboard();
+  else { lenis?.start(); positionHero(); }
 });
 reduced.addEventListener('change', () => {
   configureScroll();
-  if (tablet) tablet.style.transform = 'none';
-  syncDashboard();
+  if (reduced.matches) {
+    if (heroObject) { heroObject.style.transform = 'none'; heroObject.style.willChange = 'auto'; }
+    if (heroCopy) { heroCopy.style.transform = 'none'; heroCopy.style.willChange = 'auto'; }
+  }
 });
 fine.addEventListener('change', configureScroll);
-window.addEventListener('pagehide', () => { stopScrollFrame(); clearTimeout(leadTimer); clearTimeout(tintTimer); settleRows(); });
-window.addEventListener('pageshow', () => syncDashboard());
-
+window.addEventListener('pagehide', stopScrollFrame);
+window.addEventListener('pageshow', () => { lenis?.start(); positionHero(); });
+initSignalTuner();
+initResultsCounters(reduced);
 document.querySelectorAll<HTMLElement>('.magnetic').forEach(button => {
   button.addEventListener('pointermove', event => {
     if (!fine.matches || reduced.matches) return;
@@ -324,3 +282,36 @@ document.querySelectorAll<HTMLFormElement>('[data-enquiry-form]').forEach(form =
     }
   });
 });
+
+// At the top the bar sits on the page as it always did; the moment the page moves it turns to
+// glass. Skipped while a dialog pins the body, which zeroes scrollY and would flash the bar back.
+// Clear glass shows whatever is behind it, and one section can be dark on one side and light on
+// the other, so the logo and the links each read the surface directly behind them.
+const lumaBehind = (x: number, y: number) => {
+  let node = document.elementsFromPoint(x, y).find(el => !header.contains(el) && el !== document.body && el !== document.documentElement) ?? null;
+  while (node && node !== document.body) {
+    const fill = getComputedStyle(node).backgroundColor;
+    const [r, g, b, a = 1] = (fill.startsWith('rgb') ? fill.match(/[\d.]+/g) ?? [] : []).map(Number);
+    if (r !== undefined && a > .5) return .299 * r + .587 * g + .114 * b;
+    node = node.parentElement;
+  }
+  return 255;
+};
+const darkBehind = (el: Element | null) => {
+  const box = el?.getBoundingClientRect();
+  return !!box && box.width > 0 && lumaBehind(box.left + box.width / 2, header.offsetHeight / 2) < 145;
+};
+const logoArea = header.querySelector('.brand-link');
+const linkAreas = [header.querySelector('.desktop-nav'), header.querySelector('.menu-toggle')];
+const stick = () => {
+  if (document.body.style.position === 'fixed') return;
+  const stuck = window.scrollY > 12;
+  header.classList.toggle('is-stuck', stuck);
+  header.classList.toggle('logo-on-dark', stuck && darkBehind(logoArea));
+  header.classList.toggle('links-on-dark', stuck && linkAreas.some(darkBehind));
+};
+stick();
+window.addEventListener('scroll', stick, { passive: true });
+window.addEventListener('resize', stick, { passive: true });
+// Transitions switch on after the first paint, so reloading mid-page doesn't play the change.
+requestAnimationFrame(() => header.classList.add('is-ready'));

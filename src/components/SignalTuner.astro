@@ -1,0 +1,57 @@
+---
+import '../styles/signal-tuner.css';
+const controls = [
+  { label: 'Attention', stage: 1, className: 'attention' },
+  { label: 'Relevance', stage: 2, className: 'relevance' },
+  { label: 'Trust', stage: 3, className: 'trust' },
+  { label: 'Conversion', stage: 4, className: 'conversion' },
+];
+const ticks = Array.from({ length: 45 }, (_, i) => {
+  const angle = (-134 + i * 268 / 44) * Math.PI / 180;
+  const radius = i % 4 === 0 ? 93 : 97;
+  return { x1: 110 + Math.sin(angle) * radius, y1: 110 - Math.cos(angle) * radius, x2: 110 + Math.sin(angle) * 101, y2: 110 - Math.cos(angle) * 101, active: i <= 22 };
+});
+const waveform = Array.from({ length: 101 }, (_, i) => {
+  const x = i * 4;
+  const y = 26 + Math.sin(i * .19) * (7 + Math.sin(i * .032) * 7) + Math.sin(i * 2.1) * 3;
+  return `${i ? 'L' : 'M'}${x.toFixed(1)},${y.toFixed(1)}`;
+}).join(' ');
+---
+<figure class="tuner-figure" aria-label="Interactive Clickfield signal tuner">
+  <div class="tuner-parallax" data-hero-object>
+    <div class="signal-console" data-signal-tuner data-stage="2">
+      <span class="console-screw screw-tl" aria-hidden="true"></span><span class="console-screw screw-tr" aria-hidden="true"></span>
+      <div class="console-heading"><span>Signal tuner</span><span class="console-power"><i aria-hidden="true"></i>Marketing + software</span></div>
+      <div class="signal-display" aria-hidden="true">
+        <div class="display-text"><span>Audience signal</span><strong data-signal-status>Finding the fit</strong></div>
+        <div class="wave-window"><svg viewBox="0 0 400 52" preserveAspectRatio="none"><path class="wave-guide" d="M0 26H400"/><path class="signal-wave" data-signal-wave d={waveform} /></svg></div>
+        <div class="signal-meter"><span>Signal</span><div>{Array.from({length:9}, (_,i) => <i class:list={{lit:i<5}} data-signal-bar></i>)}</div></div>
+      </div>
+      <div class="console-controls">
+        <div class="console-grille grille-left" aria-hidden="true"><i></i></div>
+        {controls.map(control => <button type="button" class={`satellite-control satellite-${control.className}`} data-tune-stage={control.stage} aria-label={`Tune for ${control.label.toLowerCase()}`} aria-pressed={control.stage === 2 ? 'true' : 'false'}>
+          <span class="small-knob" aria-hidden="true"><i class="small-pointer"></i></span><span class="control-light" aria-hidden="true"></span><span class="control-label">{control.label}</span>
+        </button>)}
+        <div class="audience-control">
+          <span class="dial-label" id="audience-label">Find your audience</span>
+          <div class="dial-assembly">
+            <svg class="dial-scale" viewBox="0 0 220 220" aria-hidden="true">
+              {ticks.map(t => <line x1={t.x1} y1={t.y1} x2={t.x2} y2={t.y2} class:list={{'tick-active': t.active}} data-dial-tick />)}
+              <path class="scale-arc" d="M47 171 A88 88 0 1 1 173 171" pathLength="100"/>
+              <path class="scale-progress" data-signal-arc d="M47 171 A88 88 0 1 1 173 171" pathLength="100" stroke-dasharray="50 100"/>
+            </svg>
+            <div class="dial-socket"><div class="dial-edge"><div class="dial-face"><span class="dial-pointer" data-dial-pointer aria-hidden="true"></span><span class="dial-centre" aria-hidden="true"></span></div></div></div>
+            <div class="dial-grab" aria-hidden="true" data-dial-grab></div>
+            <div class="audience-dial" role="slider" tabindex="0" aria-labelledby="audience-label" aria-describedby="tuner-instructions" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" aria-valuetext="Interested, stage 3 of 5" aria-orientation="horizontal" data-audience-dial></div>
+          </div>
+          <span class="audience-stage" data-audience-stage>Interested</span>
+          <div class="stage-stops" aria-hidden="true">{Array.from({length:5},(_,i)=><i class:list={{selected:i===2}} data-stage-stop></i>)}</div>
+        </div>
+        <div class="console-grille grille-right" aria-hidden="true"><i></i></div>
+      </div>
+      <div class="console-bottom"><p data-signal-message>A message starts to resonate.</p><button type="button" class="signal-lock" data-lock-signal><span class="lock-light" aria-hidden="true"></span><span data-lock-label>Lock signal</span><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="5" y="9" width="10" height="8" rx="2"/><path d="M7 9V6a3 3 0 0 1 6 0v3"/></svg></button></div>
+      <span class="console-screw screw-bl" aria-hidden="true"></span><span class="console-screw screw-br" aria-hidden="true"></span>
+    </div>
+  </div>
+  <figcaption id="tuner-instructions"><span class="dial-gesture" aria-hidden="true">↔</span>Turn or tap the dial. Find the connection.<span class="sr-only">Use arrow keys to tune, Home for the first stage, or End to lock the signal.</span></figcaption>
+</figure>

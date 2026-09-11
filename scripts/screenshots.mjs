@@ -12,11 +12,9 @@ for (const width of [320, 375, 390, 430, 768, 1280, 1440]) {
   const layout = await page.evaluate(() => ({
     width: innerWidth,
     scrollWidth: document.documentElement.scrollWidth,
-    dashboard: (() => {
-      const dash = document.querySelector('.dashboard');
-      const list = document.querySelector('.lead-viewport');
-      const row = document.querySelector('.lead-row');
-      return { width: dash.clientWidth, height: dash.clientHeight, listHeight: list.clientHeight, rowHeight: row.clientHeight };
+    tuner: (() => {
+      const console = document.querySelector('.signal-console');
+      return { width: console.clientWidth, height: console.clientHeight };
     })(),
     fonts: [document.fonts.check('500 20px "Clash Display"'), document.fonts.check('400 16px Switzer')],
     missingImages: [...document.images].filter(i => i.complete && !i.naturalWidth).map(i => i.src),
@@ -25,7 +23,7 @@ for (const width of [320, 375, 390, 430, 768, 1280, 1440]) {
   if ([320,375,1440].includes(width)) {
     await page.screenshot({ path: `artifacts/viewport-${width}.png` });
     await page.screenshot({ path: `artifacts/page-${width}.png`, fullPage: true });
-    await (await page.$('.tablet-figure')).screenshot({ path: `artifacts/dashboard-${width}.png` });
+    await (await page.$('.tuner-figure')).screenshot({ path: `artifacts/tuner-${width}.png` });
   }
   if (width === 320 || width === 1440) {
     await page.click('.hero [data-open-enquiry]');

@@ -209,6 +209,18 @@
     document.addEventListener('pointerleave', hide);
     window.addEventListener('blur', hide);
 
+    // A modal dialog is painted in the browser's top layer, above any z-index, so
+    // the dot and ring would sit underneath it with the native cursor still off.
+    // While one is open they live inside it, and go back to the body when it shuts.
+    const home = ring.parentElement!;
+    const mount = () => {
+      const open = [...document.querySelectorAll('dialog')].filter(d => d.matches(':modal')).pop();
+      const parent = open ?? home;
+      if (ring.parentElement !== parent) parent.append(ring, dot);
+    };
+    const watch = new MutationObserver(mount);
+    document.querySelectorAll('dialog').forEach(d => watch.observe(d, { attributes: true, attributeFilter: ['open'] }));
+
     const tick = () => {
       dx += (px - dx) * 0.42;
       dy += (py - dy) * 0.42;

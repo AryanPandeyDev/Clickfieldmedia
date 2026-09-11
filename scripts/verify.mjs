@@ -28,10 +28,13 @@ try {
     await page.goto(base, { waitUntil: 'networkidle0' });
     await page.bringToFront();
     const layout = await page.evaluate(() => {
-      const tablet = document.querySelector('.tablet').getBoundingClientRect();
-      const row = document.querySelector('.lead-row').getBoundingClientRect();
-      const list = document.querySelector('.lead-viewport').getBoundingClientRect();
-      return { width: innerWidth, scrollWidth: document.documentElement.scrollWidth, ratio: tablet.width / tablet.height, visibleRows: list.height / row.height,
+      const console = document.querySelector('.signal-console').getBoundingClientRect();
+      const shell = document.querySelector('.hero .shell').getBoundingClientRect();
+      return { width: innerWidth, scrollWidth: document.documentElement.scrollWidth, tunerWidth: console.width, tunerHeight: console.height,
+        shellWidth: shell.width, tunerFlush: Math.abs(console.width - shell.width) <= 1,
+        headlineSize: parseFloat(getComputedStyle(document.querySelector('h1')).fontSize),
+        tunerInside: console.left >= 0 && console.right <= innerWidth,
+        controlSizes: [...document.querySelectorAll('.satellite-control,.signal-lock,.audience-dial')].every(el => {const r=el.getBoundingClientRect();return r.width >= 44 && r.height >= 44;}),
         oneH1: document.querySelectorAll('h1').length === 1,
         unlabelledSections: [...document.querySelectorAll('section')].filter(s => !document.getElementById(s.getAttribute('aria-labelledby'))).length,
         deadAnchors: [...document.querySelectorAll('a[href^="#"]')].filter(a => !document.getElementById(a.getAttribute('href').slice(1))).length,
@@ -40,46 +43,83 @@ try {
       };
     });
     assert.equal(layout.width, layout.scrollWidth, `Overflow at ${width}`);
-    assert.ok(Math.abs(layout.ratio - 16 / 11) < .01, `Tablet aspect at ${width}`);
-    assert.ok(layout.visibleRows >= (width <= 580 ? 1.98 : 2.98), `Clipped lead row at ${width}: ${layout.visibleRows}`);
+    assert.ok(layout.tunerInside && layout.controlSizes, `Tuner bounds/targets at ${width}`);
+    // Below 640 the console is the same object scaled to the shell, so it spans the content width exactly.
+    assert.ok(width < 640 ? layout.tunerFlush : layout.tunerWidth <= 510, `Tuner width at ${width}`);
+    assert.ok(layout.tunerHeight < 420 && layout.headlineSize >= 43, `Hero proportions at ${width}`);
     assert.ok(layout.oneH1 && !layout.unlabelledSections && !layout.deadAnchors && layout.formSizes && !layout.externalFonts);
     report.responsive.push(layout);
   }
   console.log('Responsive layout and semantics passed at all seven widths.');
-  await page.setViewport({ width:375, height:900, deviceScaleFactor:1 });
+  await page.setViewport({ width:1440, height:900, deviceScaleFactor:1 });
   await page.goto(base, { waitUntil:'networkidle0' });
   await page.bringToFront();
-  const count = () => page.$eval('[data-dashboard]', el => Number(el.dataset.arrivals));
-  await page.waitForFunction(() => Number(document.querySelector('[data-dashboard]').dataset.arrivals) > 0, { timeout:8000 });
-  assert.equal(await page.$eval('[data-lead-count]', el => el.textContent), '25');
-  report.interactions.push('375px dashboard receives a lead and updates its figure');
-  await page.evaluate(() => document.querySelector('#results').scrollIntoView({ behavior:'instant' }));
-  const paused = await count();
-  await wait(5100);
-  assert.equal(await count(), paused);
-  assert.equal(await page.evaluate(() => window.__pendingFrames()), 0);
-  report.interactions.push('Dashboard and frame callbacks stop offscreen');
-  await page.evaluate(() => scrollTo({top:0,behavior:'instant'}));
-  const foregroundCount = await count();
-  const other = await browser.newPage();
-  await other.goto('about:blank');
-  await other.bringToFront();
-  assert.equal(await page.evaluate(() => document.hidden), true);
-  await wait(5100);
-  assert.equal(await count(), foregroundCount);
-  await other.close();
-  await page.bringToFront();
-  report.interactions.push('Background tab pauses dashboard');
-  await page.click('[data-toggle-dashboard]');
-  const manual = await count();
-  await wait(5100);
-  assert.equal(await count(), manual);
-  await page.click('[data-toggle-dashboard]');
-  await page.waitForFunction(() => document.querySelector('[data-dashboard]').dataset.arrivals === '6', {timeout:35000});
-  await wait(1800);
-  assert.equal(await page.$eval('[data-lead-count]', el => el.textContent), '30');
-  assert.equal(await page.evaluate(() => window.__pendingFrames()), 0);
-  report.interactions.push('Pause/resume works; sequence stops after six arrivals');
+  const dialValue = () => page.$eval('[data-audience-dial]',el => Number(el.getAttribute('aria-valuenow')));
+  await page.focus('[data-audience-dial]');
+  await page.keyboard.press('Home'); assert.equal(await dialValue(),0);
+  await page.keyboard.press('ArrowRight'); assert.equal(await dialValue(),25);
+  await page.keyboard.press('End'); assert.equal(await dialValue(),100);
+  assert.equal(await page.$eval('[data-lock-label]',el=>el.textContent),'Signal locked');
+  await page.click('[data-tune-stage="2"]'); assert.equal(await dialValue(),50);
+  await page.click('[data-lock-signal]'); assert.equal(await dialValue(),100);
+  await page.focus('[data-audience-dial]'); await page.keyboard.press('Home');
+  const dial = await (await page.$('[data-audience-dial]')).boundingBox();
+  await page.mouse.move(dial.x+dial.width/2,dial.y+dial.height/2);
+  await page.mouse.down(); await page.mouse.move(dial.x+dial.width/2+120,dial.y+dial.height/2,{steps:12}); await page.mouse.up();
+  assert.equal(await dialValue(),75);
+  report.interactions.push('Dial keyboard, presets, lock and pointer drag update the signal and accessible values');
+  await wait(500);
+  assert.equal(await page.evaluate(()=>window.__pendingFrames()),0);
+  assert.equal(await page.$eval('html',el=>el.classList.contains('lenis')),true);
+  const wheelSamples=[];
+  for (const delta of [260,300]) {
+    const before=await page.evaluate(()=>scrollY);
+    await page.mouse.move(710,500); await page.mouse.wheel({deltaY:delta}); await wait(90);
+    const during=await page.evaluate(()=>scrollY);
+    assert.ok(during>before+1 && during<before+delta*.94,`Wheel must interpolate: ${before} -> ${during}`);
+    await wait(1800);
+    const after=await page.evaluate(()=>scrollY);
+    assert.ok(Math.abs(after-before-delta*.95)<3,`Wheel destination: ${before} -> ${after}`);
+    assert.equal(await page.evaluate(()=>window.__pendingFrames()),0);
+    wheelSamples.push({before,during,after});
+  }
+  const parallax=await page.$eval('[data-hero-object]',el=>new DOMMatrixReadOnly(getComputedStyle(el).transform).m42);
+  assert.ok(parallax>0 && parallax<=42);
+  report.interactions.push({test:'Repeated wheel after idle stays smooth; bounded hero parallax; zero idle callbacks',wheelSamples,parallax});
+  await page.evaluate(()=>scrollTo({top:0,behavior:'instant'})); await wait(100);
+  const anchorTop=await page.$eval('#results',el=>el.getBoundingClientRect().top+scrollY-parseFloat(getComputedStyle(el).scrollMarginTop)-parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop));
+  await page.click('.hero a[href="#results"]'); await wait(160);
+  const anchorDuring=await page.evaluate(()=>scrollY);
+  assert.ok(anchorDuring>0 && anchorDuring<anchorTop-20);
+  await wait(1500); assert.ok(Math.abs(await page.evaluate(()=>scrollY)-anchorTop)<3);
+  report.interactions.push('Section links use a smooth bounded scroll and reach the correct destination');
+  // Restart at the top so every result can be observed before their one-time run.
+  await page.goto(base,{waitUntil:'networkidle0'});
+  const counterSelector='[data-count-target="28"]';
+  const number=()=>page.$eval(counterSelector,el=>Number(el.textContent));
+  await page.$eval(counterSelector,el=>el.scrollIntoView({block:'center',behavior:'instant'}));
+  await page.waitForFunction(()=>{const el=document.querySelector('[data-count-target="28"]');return Number(el.textContent)>0 && Number(el.textContent)<28;});
+  await page.evaluate(()=>document.querySelector('.hero [data-open-enquiry]').click());
+  const modalPaused=await number(); await wait(350); assert.equal(await number(),modalPaused);
+  await page.keyboard.press('Escape');
+  await wait(80);
+  const counterScroll=await page.evaluate(()=>scrollY);
+  await page.evaluate(()=>scrollTo({top:0,behavior:'instant'})); await wait(50);
+  const offscreenPaused=await number(); await wait(350); assert.equal(await number(),offscreenPaused);
+  await page.evaluate(top=>scrollTo({top,behavior:'instant'}),counterScroll); await wait(80);
+  const other=await browser.newPage(); await other.goto('about:blank'); await other.bringToFront();
+  assert.equal(await page.evaluate(()=>document.hidden),true);
+  const hiddenPaused=await number(); await wait(350); assert.equal(await number(),hiddenPaused);
+  await other.close(); await page.bringToFront();
+  await page.waitForFunction(()=>[...document.querySelectorAll('[data-count-target]')].every(el=>el.dataset.counterState==='complete'));
+  assert.deepEqual(await page.$$eval('[data-count-target]',els=>els.map(el=>el.textContent)),['28','86','24']);
+  await page.evaluate(()=>scrollTo({top:0,behavior:'instant'})); await page.$eval(counterSelector,el=>el.scrollIntoView({block:'center',behavior:'instant'}));
+  await wait(400);
+  assert.deepEqual(await page.$$eval('[data-count-target]',els=>els.map(el=>el.dataset.counterRuns)),['1','1','1']);
+  assert.equal(await page.evaluate(()=>window.__pendingFrames()),0);
+  report.interactions.push('Results count through intermediate values to 28, 86 and 24 exactly once; dialog, offscreen and background pause/resume pass');
+  await page.setViewport({width:375,height:900,deviceScaleFactor:1});
+  await page.goto(base,{waitUntil:'networkidle0'});
   await page.click('.hero [data-open-enquiry]');
   assert.equal(await page.$eval('#enquiry-modal', el => el.open), true);
   await page.keyboard.press('Tab');
@@ -90,7 +130,7 @@ try {
   await page.click('.menu-toggle');
   assert.equal(await page.$eval('.menu-toggle', el => el.getAttribute('aria-expanded')), 'true');
   await page.click('#mobile-menu a[href="#software"]');
-  await wait(250);
+  await wait(1500);
   assert.equal(await page.$eval('#mobile-menu', el => el.open), false);
   await page.click('#tab-portal');
   assert.equal(await page.$eval('#panel-portal', el => el.hidden), false);
@@ -120,6 +160,37 @@ try {
   report.interactions.push('Form validation, server field error, success and re-enabled submission pass');
   page.off('request', handleRequest);
   await page.setRequestInterception(false);
+  const touch=await browser.newPage();
+  await touch.setViewport({width:375,height:900,deviceScaleFactor:1,isMobile:true,hasTouch:true});
+  await touch.goto(base,{waitUntil:'networkidle0'});
+  await touch.bringToFront();
+  assert.equal(await touch.$eval('html',el=>el.classList.contains('lenis')),false);
+  const touchDial=await (await touch.$('[data-audience-dial]')).boundingBox();
+  const cx=touchDial.x+touchDial.width/2, cy=touchDial.y+touchDial.height/2;
+  await touch.touchscreen.tap(cx,cy);
+  assert.equal(await touch.$eval('[data-audience-dial]',el=>el.getAttribute('aria-valuenow')),'75');
+  const client=await touch.createCDPSession();
+  const swipe=async(dx,dy)=>{
+    await client.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:cx,y:cy}]});
+    for(let i=1;i<=8;i++){
+      await client.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:cx+dx*i/8,y:cy+dy*i/8}]});
+      await wait(20);
+    }
+    await client.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+  };
+  await swipe(-80,0);
+  assert.equal(await touch.$eval('[data-audience-dial]',el=>el.getAttribute('aria-valuenow')),'25');
+  await swipe(0,-170); await wait(350);
+  assert.ok(await touch.evaluate(()=>scrollY)>70,'Dial preserves native vertical swiping');
+  assert.equal(await touch.$eval('[data-audience-dial]',el=>el.getAttribute('aria-valuenow')),'25');
+  const touchParallax=await touch.$eval('[data-hero-object]',el=>new DOMMatrixReadOnly(getComputedStyle(el).transform).m42);
+  assert.ok(touchParallax>=0 && touchParallax<=14);
+  for(const target of ['28','86','24']){
+    await touch.$eval(`[data-count-target="${target}"]`,el=>el.scrollIntoView({block:'center',behavior:'instant'}));
+    await touch.waitForFunction(t=>document.querySelector(`[data-count-target="${t}"]`).dataset.counterState==='complete',{},target);
+  }
+  report.interactions.push('Touch tap/drag works; vertical dial swipes scroll natively; mobile parallax stays under 14px; all three mobile counters finish');
+  await touch.close(); await page.bringToFront();
   for (const width of [375,1440]) {
     await page.setViewport({width,height:900,deviceScaleFactor:1});
     await page.goto(base,{waitUntil:'networkidle0'});
@@ -128,10 +199,12 @@ try {
   }
   await page.emulateMediaFeatures([{name:'prefers-reduced-motion',value:'reduce'}]);
   await page.goto(base,{waitUntil:'networkidle0'});
-  await wait(5200);
-  assert.equal(await count(),0);
+  await page.$eval('[data-count-target]',el=>el.scrollIntoView({block:'center',behavior:'instant'})); await wait(100);
+  assert.deepEqual(await page.$$eval('[data-count-target]',els=>els.map(el=>el.textContent)),['28','86','24']);
+  assert.equal(await page.$eval('html',el=>el.classList.contains('lenis')),false);
+  assert.equal(await page.$eval('[data-hero-object]',el=>getComputedStyle(el).transform),'none');
   assert.equal(await page.evaluate(() => window.__pendingFrames()),0);
-  report.interactions.push('Reduced motion freezes populated dashboard and all frame loops');
+  report.interactions.push('Reduced motion shows final figures immediately, disables Lenis/parallax and leaves zero callbacks');
   assert.deepEqual(errors,[]);
   report.consoleErrors = errors;
   await writeFile('artifacts/verification.json', JSON.stringify(report,null,2));
