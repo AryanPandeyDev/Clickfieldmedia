@@ -1,5 +1,28 @@
 Options -Indexes
 DirectoryIndex index.html
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Normalize explicit requests for the two generated HTML pages in one hop.
+  # THE_REQUEST excludes Apache's internal DirectoryIndex lookup, avoiding loops.
+  # Restrict these rules to this site's production hosts, leaving previews and
+  # independently hosted sister subdomains alone. Query strings are kept.
+  RewriteCond %{HTTP_HOST} ^(?:www\.)?clickfieldmedia\.com(?::[0-9]+)?$ [NC]
+  RewriteCond %{REQUEST_METHOD} ^(?:GET|HEAD)$
+  RewriteCond %{THE_REQUEST} \s/+(?:thank-you/)?index\.html[?\s]
+  RewriteRule ^(thank-you/)?index\.html$ https://clickfieldmedia.com/$1 [R=301,L]
+
+  # 308 preserves the method and body if an API request uses a noncanonical host.
+  RewriteCond %{HTTP_HOST} ^www\.clickfieldmedia\.com(?::[0-9]+)?$ [NC]
+  RewriteRule ^ https://clickfieldmedia.com%{REQUEST_URI} [R=308,NE,L]
+
+  # Avoid an HTTPS redirect loop when the hosting proxy terminates TLS.
+  # The host must overwrite X-Forwarded-Proto with the visitor's actual scheme.
+  RewriteCond %{HTTP_HOST} ^clickfieldmedia\.com(?::[0-9]+)?$ [NC]
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !^https$ [NC]
+  RewriteRule ^ https://clickfieldmedia.com%{REQUEST_URI} [R=308,NE,L]
+</IfModule>
 <IfModule mod_headers.c>
   Header always set X-Content-Type-Options "nosniff"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"

@@ -2,6 +2,12 @@
 import Base from '../layouts/Base.astro';
 import { company } from '../data/site';
 import '../styles/thank-you.css';
+
+// Calendly booking link. This page sends visitors straight on to it. Paste the
+// full "Copy link" URL from Calendly; set it to null to switch the hand-off off
+// and just show the thank-you note.
+const CALENDLY_URL: string | null =
+  'https://calendly.com/clickfieldmedia/real-estate-lead-generation-expert';
 ---
 <Base title="Enquiry received | Clickfield Media" faqSchema={false} noindex>
   <header class="thank-you-header">
@@ -29,6 +35,13 @@ import '../styles/thank-you.css';
             <p class="thank-you-received">Enquiry received</p>
             <h1 id="thank-you-title">Thank you!</h1>
             <p class="thank-you-lede">We’re glad you reached out. We’ll review your details and get back to you with a useful next step.</p>
+            {CALENDLY_URL && (
+              <p class="thank-you-book">
+                <span class="thank-you-spinner" aria-hidden="true"></span>
+                Taking you to the calendar…
+              </p>
+              <p class="thank-you-book-fallback">Not moving? <a href={CALENDLY_URL}>Open the calendar</a>.</p>
+            )}
             <div class="thank-you-paper-signoff">
               <span>Speak soon,</span>
               <strong>The Clickfield team</strong>
@@ -59,4 +72,14 @@ import '../styles/thank-you.css';
       <p>Marketing + software. Built together.</p>
     </div>
   </footer>
+  {CALENDLY_URL && (
+    <Fragment>
+      {/* Records the lead, then hands off to Calendly. The hand-off waits for
+          Google to confirm the event (the tag may still be loading), but never
+          longer than 1.5s. replace(), not assign(): pressing Back from Calendly
+          should reach the page they came from, not bounce back through here. */}
+      <script is:inline set:html={`(function(){var done=false;function go(){if(done)return;done=true;location.replace(${JSON.stringify(CALENDLY_URL)});}if(typeof gtag==='function'){gtag('event','generate_lead',{event_callback:go,event_timeout:1200});}setTimeout(go,1500);})();`} />
+      <noscript><meta http-equiv="refresh" content={`0;url=${CALENDLY_URL}`} /></noscript>
+    </Fragment>
+  )}
 </Base>

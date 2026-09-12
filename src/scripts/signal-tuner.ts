@@ -3,9 +3,10 @@ export function initSignalTuner() {
   if (!consoleEl) return;
   const dial = consoleEl.querySelector<HTMLElement>('[data-audience-dial]')!;
   const grab = consoleEl.querySelector<HTMLElement>('[data-dial-grab]')!;
-  const pointer =consoleEl.querySelector<HTMLElement>('[data-dial-pointer]')!;
+  const pointer = consoleEl.querySelector<HTMLElement>('[data-dial-pointer]')!;
   const waveform = consoleEl.querySelector<SVGPathElement>('[data-signal-wave]')!;
   const arc = consoleEl.querySelector<SVGPathElement>('[data-signal-arc]')!;
+  const smallPointers = [...consoleEl.querySelectorAll<HTMLElement>('[data-small-pointer]')];
   const ticks = [...consoleEl.querySelectorAll('[data-dial-tick]')];
   const bars = [...consoleEl.querySelectorAll('[data-signal-bar]')];
   const stops = [...consoleEl.querySelectorAll('[data-stage-stop]')];
@@ -30,6 +31,12 @@ export function initSignalTuner() {
     const stage = Math.round(value / 25);
     pointer.style.transform = `rotate(${-134 + progress * 268}deg)`;
     arc.setAttribute('stroke-dasharray', `${value} 100`);
+    // Every small knob turns with the dial, each finishing when the dial reaches its
+    // stage — so the first gets there at a quarter turn and the last at the very end.
+    smallPointers.forEach(knob => {
+      const fullAt = Number(knob.dataset.fullAt);
+      knob.style.setProperty('--turn', `${-120 + 240 * Math.min(1, value / fullAt)}deg`);
+    });
     ticks.forEach((tick,i) => tick.classList.toggle('tick-active', i <= progress * (ticks.length-1)));
     bars.forEach((bar,i) => bar.classList.toggle('lit', i < Math.max(1,Math.round(progress*9))));
     // Recalculate only in response to input: no canvas or ambient frame loop.

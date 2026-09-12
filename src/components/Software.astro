@@ -15,8 +15,7 @@ const products = [
         <span class="option-highlight" aria-hidden="true"></span>
         {products.map((product, i) => <button role="tab" id={`tab-${product.id}`} aria-controls={`panel-${product.id}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1} data-product={product.id}><span>{product.name}</span><small>{product.line}</small><span class="product-arrow" aria-hidden="true">↗</span></button>)}
       </div>
-      <p class="ownership-note">Built with you. Documented. Yours to run.</p>
-    </div>
+      <p class="ownership-note">Built with you. Documented. Yours to run.</p>    </div>
     <div class="software-preview">
       <div id="panel-crm" role="tabpanel" aria-labelledby="tab-crm" tabindex="0" class="product-panel">
         <div class="workspace-heading"><span class="workspace-mark" aria-hidden="true">P</span><div><strong>Project workspace</strong><span>Sales pipeline</span></div><span class="workspace-initial" aria-hidden="true">AS</span></div>

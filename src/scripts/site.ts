@@ -264,11 +264,10 @@ document.querySelectorAll<HTMLFormElement>('[data-enquiry-form]').forEach(form =
         }
         throw new Error(result.message || (typeof result.error === 'string' ? result.error : result.error?.message) || 'Your enquiry could not be sent. Please try again or email info@clickfieldmedia.com.');
       }
-      message.textContent = 'Enquiry received. We’ll review your details and get back to you about the work.';
-      message.dataset.state = 'success';
-      message.hidden = false;
-      form.reset();
-      message.focus();
+      // Success lives on its own page, which hands straight off to Calendly, and
+      // the back button can't land someone on a form they have already sent.
+      window.location.assign(result.redirect ?? '/thank-you/');
+      return;
     } catch (error) {
       message.textContent = error instanceof Error && error.name !== 'AbortError' && error.message !== 'Failed to fetch' ? error.message : 'The connection timed out. Please try again, or email info@clickfieldmedia.com.';
       message.dataset.state = 'error';

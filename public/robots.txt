@@ -1,5 +1,3 @@
 User-agent: *
-Allow: /
 Disallow: /api/
-Disallow: /thank-you/
 Sitemap: https://clickfieldmedia.com/sitemap.xml

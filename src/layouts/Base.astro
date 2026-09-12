@@ -27,6 +27,16 @@ const schema = {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#eee9e1" />
+    <!-- Google tag (gtag.js). is:inline on both: the loader must stay an
+         unbundled external script, and the config defines a global `gtag` that
+         the click tracking and the thank-you page's own script call by name. -->
+    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-YJSFKS7SWF"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag('js', new Date());
+      gtag('config', 'G-YJSFKS7SWF');
+    </script>
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="robots" content={noindex ? 'noindex, follow' : 'index, follow'} />
@@ -40,17 +50,40 @@ const schema = {
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={`${origin}/logo-navy.png`} />
-    <meta property="og:image:alt" content="Clickfield Media" />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:image" content={`${origin}/og-image.png`} />
+    <meta property="og:image:secure_url" content={`${origin}/og-image.png`} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Clickfield Media: More qualified enquiries. Not just clicks." />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={`${origin}/logo-navy.png`} />
+    <meta name="twitter:image" content={`${origin}/og-image.png`} />
+    <meta name="twitter:image:alt" content="Clickfield Media: More qualified enquiries. Not just clicks." />
     <script is:inline type="application/ld+json" set:html={JSON.stringify(schema).replace(/</g, '\\u003c')} />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
     <slot />
     <Cursor />
+    <script>
+      import { wireAnalytics } from '../scripts/analytics';
+      wireAnalytics();
+    </script>
+    <script>
+      // A mailto link does nothing on a desktop with no mail program set up, which
+      // is common. With a mouse, open a Gmail draft in a new tab instead; phones
+      // keep the mailto link, which opens their mail app.
+      const desktop = window.matchMedia('(hover: hover) and (pointer: fine)');
+      document.querySelectorAll<HTMLAnchorElement>('a[href^="mailto:"]').forEach(link => {
+        link.addEventListener('click', event => {
+          if (!desktop.matches) return;
+          const to = decodeURIComponent(link.href.slice('mailto:'.length).split('?')[0]);
+          event.preventDefault();
+          window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}`, '_blank', 'noopener');
+        });
+      });
+    </script>
   </body>
 </html>

@@ -6,7 +6,10 @@ const controls = [
   { label: 'Trust', stage: 3, className: 'trust' },
   { label: 'Conversion', stage: 4, className: 'conversion' },
 ];
-const ticks = Array.from({ length: 45 }, (_, i) => {
+// Matches the script: a small knob sweeps -120deg to 120deg, finishing when the
+// big dial reaches its stage. Worked out here so the first paint is already right.
+const smallTurn = (value: number, fullAt: number) => -120 + 240 * Math.min(1, value / fullAt);
+const ticks =Array.from({ length: 45 }, (_, i) => {
   const angle = (-134 + i * 268 / 44) * Math.PI / 180;
   const radius = i % 4 === 0 ? 93 : 97;
   return { x1: 110 + Math.sin(angle) * radius, y1: 110 - Math.cos(angle) * radius, x2: 110 + Math.sin(angle) * 101, y2: 110 - Math.cos(angle) * 101, active: i <= 22 };
@@ -30,7 +33,7 @@ const waveform = Array.from({ length: 101 }, (_, i) => {
       <div class="console-controls">
         <div class="console-grille grille-left" aria-hidden="true"><i></i></div>
         {controls.map(control => <button type="button" class={`satellite-control satellite-${control.className}`} data-tune-stage={control.stage} aria-label={`Tune for ${control.label.toLowerCase()}`} aria-pressed={control.stage === 2 ? 'true' : 'false'}>
-          <span class="small-knob" aria-hidden="true"><i class="small-pointer"></i></span><span class="control-light" aria-hidden="true"></span><span class="control-label">{control.label}</span>
+          <span class="small-knob" aria-hidden="true"><i class="small-pointer" data-small-pointer data-full-at={control.stage * 25} style={`--turn:${smallTurn(50, control.stage * 25)}deg`}></i></span><span class="control-light" aria-hidden="true"></span><span class="control-label">{control.label}</span>
         </button>)}
         <div class="audience-control">
           <span class="dial-label" id="audience-label">Find your audience</span>

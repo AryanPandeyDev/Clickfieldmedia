@@ -89,11 +89,11 @@
 .satellite-attention {grid-column:1;grid-row:1;}.satellite-trust {grid-column:1;grid-row:2;}.satellite-relevance {grid-column:3;grid-row:1;}.satellite-conversion {grid-column:3;grid-row:2;}
 .control-label {font-weight:500;line-height:1.2;}
 .small-knob {width:36px;height:36px;border-radius:50%;position:relative;background:linear-gradient(145deg,var(--signal-light),var(--signal-mid));border:2px solid var(--signal-ink);box-shadow:0 3px 3px var(--signal-shadow),inset 1px 1px 1px var(--signal-light),inset -1px -2px 2px var(--signal-edge),0 0 0 3px var(--signal-mid),0 0 0 4px var(--signal-rim);}
-.small-pointer {position:absolute;inset:0;transform:rotate(-45deg);transition:transform .28s cubic-bezier(.2,.9,.3,1.15);}
+/* Geared to the big dial: the script sets --turn on each one as the dial moves.
+   They all start together but at different speeds, so each reaches the right in turn. */
+.small-pointer {position:absolute;inset:0;transform:rotate(var(--turn,-120deg));transition:transform .32s cubic-bezier(.2,.9,.3,1.15);}
 .small-pointer::before {content:'';position:absolute;width:3px;height:8px;border-radius:2px;background:var(--signal-ink);top:5px;left:calc(50% - 1.5px);}
-.satellite-control[aria-pressed=true] .small-pointer {transform:rotate(35deg);}
-.satellite-control:hover .small-pointer {transform:rotate(-25deg);}
-.satellite-control[aria-pressed=true]:hover .small-pointer {transform:rotate(45deg);}
+.signal-console.is-dragging .small-pointer {transition:none;}
 .satellite-control:active .small-knob {transform:translateY(1px);}
 .control-light {display:none;}
 .console-grille {position:absolute;top:50px;bottom:32px;width:10px;background:radial-gradient(circle at center,var(--signal-ink) 1px,var(--signal-edge) 1.4px,var(--signal-clear) 2px);background-size:5px 5px;border-radius:6px;opacity:.68;}

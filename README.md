@@ -27,6 +27,14 @@ The existing business website uses PHP hosting, so this build reuses and adapts 
 
 Do not place PHP source on a static-only host. For that hosting model, move the API to a PHP-capable service and configure a same-origin proxy, or replace the endpoint with a supported backend. Nothing was published or uploaded by this task.
 
+### SEO deployment checks
+
+The root `.htaccess` normalizes the production `www` host and HTTP requests to `https://clickfieldmedia.com`, preserving paths and query strings. Explicit `/index.html` and `/thank-you/index.html` page requests redirect to their directory URLs; internal directory-index lookups do not redirect. Local previews and sister subdomains are excluded. Enable `mod_rewrite` (or the LiteSpeed equivalent). When TLS terminates at a proxy, the host must overwrite `X-Forwarded-Proto` with the visitor's actual scheme.
+
+After uploading the build, verify HTTP, www and explicit index-file URLs reach their preferred HTTPS URLs without loops, and that a query such as `?utm_source=seo-check` survives. The Node preview does not execute `.htaccess`, so it cannot validate those hosting redirects. Confirm the homepage returns 200 and a nonexistent path returns 404.
+
+The thank-you page remains `noindex, follow` and is omitted from the sitemap, but robots.txt allows it to be fetched so search engines can read that instruction. The sitemap omits optional `lastmod` rather than publishing a fixed or build-time date. If the domain changes, update the host-specific rules in `.htaccess` as well as the site URL and robots.txt.
+
 ## Enquiry behaviour
 
 Both the modal and contact section use the same Astro form component. Inputs use native validation; API errors name and focus the offending field. Sending is bounded by a timeout and disables duplicate submissions. Success is shown only after a successful JSON response. Without JavaScript, a successful POST redirects to the small thank-you page.

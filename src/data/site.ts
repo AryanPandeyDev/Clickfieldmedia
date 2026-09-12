@@ -5,6 +5,7 @@ export const company = {
   telephone: '+916393735033',
   address: '3/245, Vijayant Khand, Gomti Nagar, Lucknow 226010',
   realEstate: 'https://realestate.clickfieldmedia.com',
+  tech: 'https://tech.clickfieldmedia.com',
   map: 'https://www.google.com/maps/search/?api=1&query=3%2F245%20Vijayant%20Khand%20Gomti%20Nagar%20Lucknow%20226010',
 };
 
