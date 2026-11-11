@@ -1,0 +1,177 @@
+---
+import Base from '../../layouts/Base.astro';
+import { company } from '../../data/site';
+import { developerJob as job, developerExperienceOptions as experienceOptions } from '../../data/developer-job';
+import '../../styles/hiring.css';
+
+const noticeOptions = ['Can join immediately', '15 days', '30 days', '60 days', '90 days or more'];
+---
+<Base
+  title={`${job.title} | Careers at Clickfield Media`}
+  description={`${company.name} is hiring a full-time Software Developer in Lucknow for full stack development, AI automation and SEO. ${job.experience} of experience, ${job.salary}, on-site, ${job.timing}. Apply with your CV.`}
+  faqSchema={false}
+  whatsapp={false}
+>
+  <header class="hiring-header">
+    <div class="shell hiring-nav">
+      <a class="hiring-brand" href="/" aria-label="Clickfield Media home"><img src="/logo-navy.webp" alt="Clickfield Media" width="528" height="164" /></a>
+      <a class="hiring-back" href="/"><span aria-hidden="true">←</span> Back to website</a>
+    </div>
+  </header>
+
+  <main id="main" class="hiring-page">
+    <div class="hiring-column">
+      <section class="hiring-intro" aria-labelledby="job-title">
+        <h1 id="job-title">Software Developer <span class="developer-specialism">(Full Stack, AI Automation &amp; SEO)</span></h1>
+        <ul class="hiring-facts" aria-label="Role details">
+          <li><span>Experience</span>{job.experience}</li>
+          <li><span>Employment type</span>{job.type}</li>
+          <li><span>Salary</span>{job.salary}</li>
+          <li><span>Work mode</span>{job.workMode}</li>
+          <li><span>Office timing</span>{job.timing}</li>
+        </ul>
+        <p class="developer-salary-note">Salary is based on skills, experience and practical capabilities.</p>
+        <p class="hiring-notice"><strong>This is a work-from-office job in Lucknow.</strong> There is no work from home or remote option. Please apply only if you can come to our office every working day.</p>
+        <a class="button button-primary hiring-apply-link" href="#apply">Apply now <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14m-5-5 5 5 5-5" /></svg></a>
+      </section>
+
+      <section class="hiring-block" aria-labelledby="responsibilities-title">
+        <h2 id="responsibilities-title">Roles & responsibilities</h2>
+        <ul class="hiring-ticks">{job.responsibilities.map(item => <li>{item}</li>)}</ul>
+      </section>
+
+      <section class="hiring-block developer-qualifications" aria-labelledby="qualifications-title">
+        <h2 id="qualifications-title">Required skills & qualifications</h2>
+        {job.qualifications.map(group => (
+          <div class="developer-skill-group">
+            <h3>{group.title}</h3>
+            <ul class="hiring-ticks">{group.skills.map(skill => <li>{skill}</li>)}</ul>
+          </div>
+        ))}
+      </section>
+
+      <section class="hiring-block" aria-labelledby="compensation-title">
+        <h2 id="compensation-title">Compensation & work requirements</h2>
+        <ul class="hiring-ticks">
+          <li><strong>Salary:</strong> ₹3,00,000 – ₹6,00,000 per annum, depending on technical expertise, experience and practical capabilities.</li>
+          <li><strong>Work location:</strong> On-site in Lucknow.</li>
+          <li><strong>Remote work:</strong> Not available.</li>
+          <li><strong>Equipment:</strong> Candidates must bring their own laptop.</li>
+          <li><strong>Employment type:</strong> Full-time.</li>
+        </ul>
+      </section>
+
+      <section class="hiring-block developer-ideal" aria-labelledby="ideal-title">
+        <h2 id="ideal-title">Ideal candidate</h2>
+        <p class="hiring-lede">We are looking for a versatile developer who can independently take a business requirement and turn it into a working technical solution.</p>
+        <p>The ideal candidate should be comfortable working across frontend, backend, databases, cloud infrastructure, SEO and AI automation. They should also be confident interacting directly with clients, understanding their problems, proposing technical solutions and taking complete ownership of implementation and delivery.</p>
+        <p><strong>We value practical problem-solving, execution and the ability to build real-world solutions over knowledge of specific technologies alone.</strong></p>
+      </section>
+
+      <section class="hiring-block" aria-labelledby="office-title">
+        <h2 id="office-title">Office address & timing</h2>
+        <div class="hiring-office">
+          <div>
+            <span class="hiring-office-label">Office address</span>
+            <address><a href={company.map} target="_blank" rel="noopener noreferrer">3/245, Vijayant Khand<br />Gomti Nagar, Lucknow 226010<br />Uttar Pradesh, India</a></address>
+            <span class="hiring-office-note">Behind Chandan Hospital</span>
+          </div>
+          <div>
+            <span class="hiring-office-label">Office timing</span>
+            <p class="hiring-office-value">{job.timing}</p>
+            <span class="hiring-office-note">Work from office only. No work from home or remote.</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="apply" class="hiring-block hiring-apply" aria-labelledby="apply-title">
+        <h2 id="apply-title">Apply for this role</h2>
+        <p>Fill in your details and upload your CV. We’ll send a 6-digit code to your email to confirm it’s really you.</p>
+        <noscript><p class="form-message">This form needs JavaScript to verify your email. You can also email your CV to <a href={`mailto:${company.careersEmail}`}>{company.careersEmail}</a>.</p></noscript>
+        <form class="hiring-form" action="/api/apply.php" method="post" enctype="multipart/form-data" data-apply-form>
+          <input type="hidden" name="role" value={job.title} />
+          <div class="form-honeypot" aria-hidden="true"><label>Leave empty<input name="website" tabindex="-1" autocomplete="off" /></label></div>
+
+          <fieldset class="hiring-fieldset">
+            <legend>About you</legend>
+            <div class="form-grid">
+              <label class="field"><span>Full name</span><input name="name" autocomplete="name" required maxlength="100" placeholder="Your full name" /></label>
+              <label class="field"><span>Email</span><input name="email" type="email" autocomplete="email" required maxlength="200" placeholder="you@example.com" /></label>
+              <label class="field"><span>Phone number</span><input name="phone" type="tel" inputmode="tel" autocomplete="tel" required minlength="7" maxlength="24" pattern="[+0-9() .\-]{7,24}" placeholder="+91" /></label>
+              <label class="field"><span>City you live in</span><input name="city" autocomplete="address-level2" required maxlength="100" placeholder="e.g. Lucknow" /></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="hiring-fieldset">
+            <legend>Your experience</legend>
+            <div class="form-grid">
+              <label class="field form-wide"><span>Years of experience in software development</span><select name="experience" required><option value="" disabled selected>Select</option>{experienceOptions.map(option => <option>{option}</option>)}</select></label>
+              <label class="field"><span>Current or most recent job title <span class="optional">(optional)</span></span><input name="job_title" autocomplete="organization-title" maxlength="150" placeholder="e.g. Full Stack Developer" /></label>
+              <label class="field"><span>Company <span class="optional">(optional)</span></span><input name="company" autocomplete="organization" maxlength="150" placeholder="Company name" /></label>
+              <div class="field form-wide">
+                <span id="cv-label">Your CV</span>
+                <label class="hiring-upload" data-upload>
+                  <input name="cv" type="file" required accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-labelledby="cv-label" aria-describedby="cv-hint" data-upload-input />
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m-5 5 5-5 5 5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3" /></svg>
+                  <span class="hiring-upload-text"><strong data-upload-name>Choose a file</strong><small id="cv-hint">PDF or Word, up to 5 MB</small></span>
+                </label>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="hiring-fieldset">
+            <legend>A little more <span class="optional">(optional)</span></legend>
+            <div class="form-grid">
+              <label class="field"><span>Current salary (CTC)</span><input name="current_ctc" maxlength="60" placeholder="Your current CTC" /></label>
+              <label class="field"><span>Expected salary (CTC)</span><input name="expected_ctc" maxlength="60" placeholder="Your expected CTC" /></label>
+              <label class="field"><span>Notice period</span><select name="notice"><option value="" selected>Select</option>{noticeOptions.map(option => <option>{option}</option>)}</select></label>
+              <label class="field"><span>LinkedIn profile</span><input name="linkedin" type="url" inputmode="url" maxlength="300" placeholder="https://www.linkedin.com/in/your-name" /></label>
+              <label class="field form-wide"><span>GitHub profile or project link</span><input name="portfolio" type="url" inputmode="url" maxlength="300" placeholder="https://github.com/your-name or a live project" /></label>
+              <label class="field form-wide"><span>Tell us about a project you built and the problem it solved</span><textarea name="message" rows="4" maxlength="2000" placeholder="The business problem, your approach, what you built and how you deployed it."></textarea></label>
+            </div>
+          </fieldset>
+
+          <div data-apply-step="details">
+            <p class="form-message" data-form-message role="status" tabindex="-1" hidden></p>
+            <button class="button button-primary form-submit" type="submit"><span data-submit-text>Verify email and continue</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 14 0m-5-5 5 5-5 5" /></svg></button>
+            <p class="form-note">We’ll only use your details to consider you for this role.</p>
+          </div>
+
+          <div class="hiring-verify" data-apply-step="code" hidden>
+            <h3 class="hiring-verify-title" tabindex="-1" data-verify-title>Check your email</h3>
+            <p>We sent a 6-digit code to <strong data-verify-email></strong>. Enter it below to send your application.</p>
+            <label class="field hiring-code-field"><span>Verification code</span><input name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" placeholder="6-digit code" data-code-input disabled /></label>
+            <p class="form-message" data-code-message role="status" tabindex="-1" hidden></p>
+            <button class="button button-primary form-submit" type="submit"><span data-verify-text>Confirm and send application</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 14 0m-5-5 5 5-5 5" /></svg></button>
+            <div class="hiring-verify-actions">
+              <button type="button" class="hiring-text-button" data-resend>Resend code</button>
+              <button type="button" class="hiring-text-button" data-change-details>Change my details</button>
+            </div>
+            <p class="form-note">Can’t find it? Check your spam or promotions folder.</p>
+          </div>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <footer class="hiring-footer">
+    <div class="shell hiring-footer-inner">
+      <p>Clickfield Media</p>
+      <p>Questions about the role? <a href={`mailto:${company.careersEmail}`}>{company.careersEmail}</a></p>
+    </div>
+  </footer>
+
+  <script>
+    import { initApplyForm } from '../../scripts/hiring';
+    initApplyForm();
+  </script>
+</Base>
+
+<style>
+  .developer-specialism { display: block; margin-top: 16px; font-family: var(--font-body); font-size: clamp(1.2rem, 3vw, 1.6rem); font-weight: 500; line-height: 1.4; letter-spacing: normal; }
+  .developer-salary-note { margin-top: 12px; color: var(--color-muted); font-size: 14px; }
+  .developer-skill-group { margin-top: 24px; }
+  .developer-skill-group + .developer-skill-group { margin-top: 36px; }
+  .developer-skill-group h3 { margin-bottom: 18px; font-size: clamp(1.2rem, 2.4vw, 1.5rem); color: var(--color-navy); }
+  .developer-ideal p + p { margin-top: 20px; }
+</style>

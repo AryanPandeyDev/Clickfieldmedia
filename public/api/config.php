@@ -126,6 +126,51 @@ return [
         //   csv         Where verified applications for the role are recorded.
         //               A file each, because the columns differ by role.
         'roles' => [
+            'Software Developer (Full Stack, AI Automation & SEO)' => [
+                'fields' => [
+                    'role' => 'Role',
+                    'name' => 'Name',
+                    'email' => 'Email (verified)',
+                    'phone' => 'Phone',
+                    'city' => 'City',
+                    'experience' => 'Software development experience',
+                    'job_title' => 'Current job title',
+                    'company' => 'Company',
+                    'portfolio' => 'GitHub / project link',
+                    'linkedin' => 'LinkedIn',
+                    'current_ctc' => 'Current CTC',
+                    'expected_ctc' => 'Expected CTC',
+                    'notice' => 'Notice period',
+                    'message' => 'A project they built',
+                ],
+                'optional' => ['job_title', 'company', 'portfolio', 'linkedin', 'current_ctc', 'expected_ctc', 'notice', 'message'],
+                'experience' => ['Less than 2 years', '2 to 3 years', '4 to 5 years', 'More than 5 years'],
+                'links' => ['portfolio' => 'any', 'linkedin' => 'linkedin'],
+                'csv' => 'applications/software-developer.csv',
+            ],
+
+            'Business Development Manager' => [
+                'fields' => [
+                    'role' => 'Role',
+                    'name' => 'Name',
+                    'email' => 'Email (verified)',
+                    'phone' => 'Phone',
+                    'city' => 'City',
+                    'experience' => 'Business development / sales experience',
+                    'job_title' => 'Current job title',
+                    'company' => 'Company',
+                    'linkedin' => 'LinkedIn',
+                    'current_ctc' => 'Current CTC',
+                    'expected_ctc' => 'Expected CTC',
+                    'notice' => 'Notice period',
+                    'message' => 'A deal they closed',
+                ],
+                'optional' => ['linkedin', 'current_ctc', 'expected_ctc', 'notice', 'message'],
+                'experience' => ['Less than 2 years', '2 to 3 years', '4 to 5 years', 'More than 5 years'],
+                'links' => ['linkedin' => 'linkedin'],
+                'csv' => 'applications/business-development-manager.csv',
+            ],
+
             'Digital Marketing Manager' => [
                 'fields' => [
                     'role' => 'Role',
