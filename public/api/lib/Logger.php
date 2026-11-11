@@ -9,7 +9,12 @@ declare(strict_types=1);
  *   failures.log  every request that did not result in a queued email, one
  *                 JSON object per line, so it can be read with tail or
  *                 filtered with grep without a parser.
- *   leads.csv     every accepted enquiry, so a mail outage never loses one.
+ *   leads.csv     every accepted enquiry, written before the mail is
+ *                 attempted, so neither a mail outage nor a browser giving up
+ *                 mid-send can lose one.
+ *   incomplete.csv  submissions that were turned away for a missing or
+ *                 malformed field, with whatever the visitor had typed. Some
+ *                 of them are a real enquiry that gave up at the error.
  *
  * Each line carries the same short reference that the visitor is shown on
  * screen, which is the point: when someone reports "it said it failed", that
@@ -60,32 +65,105 @@ final class Logger
     }
 
     /**
-     * Persist an accepted lead before the mail is attempted, so a delivery
-     * problem is ours to chase rather than the visitor's to retry.
+     * Persist a lead. Called before the mail is attempted, so that nothing
+     * happening during delivery can cost us the enquiry: a delivery problem is
+     * ours to chase rather than the visitor's to retry.
+     *
+     * $status is written to the fourth column. A bool is the plain emailed or
+     * not of a finished attempt; a string carries anything else worth knowing
+     * there — 'pending' while the mail is still in flight, or the reason a
+     * submission was turned away, for the file of rejected ones.
      */
-    public function lead(array $data, array $fields, bool $mailed): bool
-    {
-        $file = $this->storage->path('leads.csv');
+    public function lead(
+        array $data,
+        array $fields,
+        bool|string $status,
+        string $fileName = 'leads.csv',
+        string $statusLabel = 'Emailed',
+    ): bool {
+        $file = $this->storage->path($fileName);
         $isNew = !file_exists($file) || filesize($file) === 0;
 
         $handle = @fopen($file, 'a');
         if ($handle === false) {
-            $this->failure('lead_store_failed', 'Could not write leads.csv', ['lead' => $data]);
+            // The whole lead goes into the context, so an unwritable CSV still
+            // leaves it recoverable from failures.log — or, failing that, from
+            // the host's PHP error log.
+            $this->failure('lead_store_failed', 'Could not write ' . $fileName, ['lead' => $data]);
             return false;
         }
 
         @flock($handle, LOCK_EX);
         if ($isNew) {
-            @fputcsv($handle, array_merge(['Received', 'Reference', 'IP', 'Emailed'], array_values($fields)));
+            @fputcsv($handle, array_merge(['Received', 'Reference', 'IP', $statusLabel], array_values($fields)));
         }
         $written = @fputcsv($handle, array_merge(
-            [date('c'), $this->requestId, $this->clientIp(), $mailed ? 'yes' : 'NO'],
+            [date('c'), $this->requestId, $this->clientIp(), is_string($status) ? $status : ($status ? 'yes' : 'NO')],
             array_map([$this, 'csvSafe'], array_values($data)),
         ));
         @flock($handle, LOCK_UN);
         @fclose($handle);
         @chmod($file, 0600);
         return $written !== false;
+    }
+
+    /**
+     * Settle the row this request wrote once the mail outcome is known.
+     *
+     * The row is saved as 'pending' before the mail is attempted and finished
+     * here, which is what makes the save unconditional: whatever happens
+     * during an SMTP conversation, the lead is already on disk.
+     *
+     * The file is rewritten in one write under the same exclusive lock rather
+     * than patched in place, because a CSV cell has no fixed width and seeking
+     * to overwrite one would shift every byte after it. A contact form's CSV
+     * is small enough that this costs nothing, and a row left reading
+     * 'pending' is still a lead — just one whose delivery we cannot vouch for.
+     */
+    public function settleMailed(bool $mailed, string $fileName = 'leads.csv'): bool
+    {
+        $handle = @fopen($this->storage->path($fileName), 'r+');
+        if ($handle === false) {
+            return false;
+        }
+
+        @flock($handle, LOCK_EX);
+
+        $rows = [];
+        $found = false;
+        while (($row = @fgetcsv($handle)) !== false) {
+            // fgetcsv reports a blank line as a single null field.
+            if ($row === [null]) {
+                continue;
+            }
+            if (($row[1] ?? '') === $this->requestId && ($row[3] ?? '') === 'pending') {
+                $row[3] = $mailed ? 'yes' : 'NO';
+                $found = true;
+            }
+            $rows[] = $row;
+        }
+
+        // Built whole before anything is truncated, so a failure part way
+        // through writing cannot leave the file short of rows.
+        if ($found) {
+            $buffer = fopen('php://temp', 'r+');
+            foreach ($rows as $row) {
+                @fputcsv($buffer, $row);
+            }
+            rewind($buffer);
+            $body = (string) stream_get_contents($buffer);
+            fclose($buffer);
+
+            if ($body !== '') {
+                @rewind($handle);
+                @ftruncate($handle, 0);
+                @fwrite($handle, $body);
+            }
+        }
+
+        @flock($handle, LOCK_UN);
+        @fclose($handle);
+        return $found;
     }
 
     /**

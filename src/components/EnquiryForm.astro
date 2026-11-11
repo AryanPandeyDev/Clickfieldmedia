@@ -4,7 +4,6 @@ interface Props { id: string; }
 const { id } = Astro.props;
 ---
 <form id={id} class="enquiry-form" action="/api/contact.php" method="post" data-enquiry-form>
-  <div class="form-honeypot" aria-hidden="true"><label>Leave empty<input name="website" tabindex="-1" autocomplete="off" /></label></div>
   <div class="form-grid">
     <label class="field"><span>Your name</span><input name="name" autocomplete="name" required maxlength="100" placeholder="Full name" /></label>
     <label class="field"><span>Work email</span><input name="email" type="email" autocomplete="email" required maxlength="200" placeholder="you@company.com" /></label>

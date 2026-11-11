@@ -202,34 +202,15 @@
   line-height: 1.75;
   text-wrap: pretty;
 }
-/* Shown for the moment before the page hands off to Calendly. */
+/* Calendly is an optional next step after the enquiry is confirmed. */
 .thank-you-book {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-scroll-sm);
   margin-top: var(--space-scroll-lg);
-  color: var(--color-navy);
-  font-size: 14px;
-  font-weight: 500;
+  text-decoration: none;
 }
-.thank-you-spinner {
-  width: 16px;
-  height: 16px;
-  flex: none;
-  border-radius: 50%;
-  border: 2px solid var(--color-scroll-rule);
-  border-top-color: var(--color-orange-ink);
-  animation: thank-you-spin .8s linear infinite;
-}
-@keyframes thank-you-spin { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) { .thank-you-spinner { display: none; } }
-.thank-you-book-fallback {
-  margin-top: var(--space-scroll-xs);
-  color: var(--color-muted);
-  font-size: 12px;
-}
-.thank-you-book-fallback a { color: var(--color-navy); text-decoration: underline; text-underline-offset: 3px; }
 .thank-you-paper-signoff {
   display: grid;
   gap: var(--space-scroll-xs);

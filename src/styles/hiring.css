@@ -1,0 +1,320 @@
+/* /hiring: one job post read top to bottom, then the application form.
+ * A single narrow column so lines stay short enough to read comfortably. */
+
+.hiring-header {
+  position: relative;
+  z-index: 2;
+  margin-top: calc(-1 * var(--header-h));
+  background: var(--color-paper);
+  border-bottom: 1px solid var(--color-line);
+}
+.hiring-nav {
+  min-height: 84px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.hiring-brand { min-height: 44px; display: inline-flex; align-items: center; }
+.hiring-brand img { width: 148px; }
+.hiring-back {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.hiring-back:hover { text-decoration: underline; text-underline-offset: 5px; }
+
+.hiring-page { padding-block: 72px 96px; color: var(--color-charcoal); }
+.hiring-column { width: min(100% - 40px, 760px); margin-inline: auto; }
+
+/* Title */
+.hiring-intro h1 {
+  color: var(--color-navy);
+  font-size: clamp(2.5rem, 6vw, 4.1rem);
+}
+.hiring-facts {
+  list-style: none;
+  margin: 28px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.hiring-facts li {
+  display: grid;
+  gap: 2px;
+  padding: 12px 18px;
+  background: var(--color-paper);
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  color: var(--color-navy);
+  font-size: 17px;
+  font-weight: 600;
+}
+.hiring-facts li span { font-size: 12px; font-weight: 500; color: var(--color-muted); }
+.hiring-notice {
+  margin-top: 20px;
+  padding: 14px 16px 14px 18px;
+  border-left: 4px solid var(--color-orange);
+  border-radius: 0 8px 8px 0;
+  background: var(--color-coral-wash);
+  color: var(--color-navy);
+  font-size: 16px;
+  line-height: 1.6;
+  max-width: 64ch;
+}
+.hiring-apply-link { margin-top: 32px; }
+
+/* Office address and timing */
+.hiring-office { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.hiring-office > div {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  padding: 20px;
+  background: var(--color-paper);
+  border: 1px solid var(--color-line);
+  border-radius: 10px;
+}
+.hiring-office-label { font-size: 12px; font-weight: 500; color: var(--color-muted); }
+.hiring-office address { font-style: normal; }
+.hiring-office address a { color: var(--color-navy); font-size: 17px; font-weight: 500; line-height: 1.55; text-decoration: underline; text-decoration-color: var(--color-line); text-underline-offset: 5px; }
+.hiring-office address a:hover { text-decoration-color: var(--color-orange); }
+.hiring-office-value { font-family: var(--font-display); font-size: 28px; font-weight: 500; line-height: 1.2; color: var(--color-navy); }
+.hiring-office-note { font-size: 14px; color: var(--color-amber-ink); }
+.hiring-apply-link:hover svg { transform: translateY(3px); }
+
+/* Sections */
+.hiring-block {
+  margin-top: 64px;
+  padding-top: 48px;
+  border-top: 1px solid var(--color-line);
+}
+.hiring-block h2 {
+  color: var(--color-navy);
+  font-size: clamp(1.7rem, 3.2vw, 2.2rem);
+  margin-bottom: 18px;
+}
+.hiring-block > p { font-size: 17px; line-height: 1.7; max-width: 64ch; }
+.hiring-block > p.hiring-lede { font-size: 19px; line-height: 1.7; color: var(--color-navy); }
+
+/* Skills as tags */
+.hiring-tags {
+  list-style: none;
+  margin: 24px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.hiring-tags li {
+  padding: 9px 15px;
+  background: var(--color-paper);
+  border: 1px solid var(--color-line);
+  border-radius: 999px;
+  color: var(--color-navy);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.35;
+  transition: border-color .2s, background-color .2s;
+}
+@media (hover: hover) and (pointer: fine) {
+  .hiring-tags li:hover { border-color: var(--color-orange); background: var(--color-white); }
+}
+
+/* Metrics as four boxes */
+.hiring-metrics {
+  list-style: none;
+  margin: 24px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+.hiring-metrics li {
+  display: grid;
+  gap: 6px;
+  align-content: start;
+  padding: 20px 18px;
+  background: var(--color-navy);
+  border-radius: 10px;
+}
+.hiring-metrics strong {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 30px;
+  line-height: 1;
+  letter-spacing: -.02em;
+  color: var(--color-amber);
+}
+.hiring-metrics span { font-size: 14px; line-height: 1.4; color: var(--color-screen-text); }
+.hiring-metrics + .hiring-ticks { margin-top: 20px; }
+
+/* Ticked lists */
+.hiring-ticks {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+}
+.hiring-ticks li {
+  position: relative;
+  padding-left: 36px;
+  font-size: 17px;
+  line-height: 1.55;
+}
+.hiring-ticks li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 1px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--color-mint-wash) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2331583f' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 12.5 3.2 3.2L17 9'/%3E%3C/svg%3E") center / 18px no-repeat;
+}
+
+/* Application form */
+.hiring-apply > p { color: var(--color-muted); }
+.hiring-form {
+  margin-top: 28px;
+  padding: 32px;
+  background: var(--color-paper);
+  border-radius: 12px;
+}
+.hiring-fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+.hiring-fieldset + .hiring-fieldset { margin-top: 30px; padding-top: 28px; border-top: 1px solid var(--color-line); }
+/* Floated so the divider above runs clear of the legend instead of through it. */
+.hiring-fieldset legend {
+  float: left;
+  width: 100%;
+  padding: 0;
+  margin-bottom: 18px;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--color-navy);
+}
+.hiring-fieldset legend .optional { font-family: var(--font-body); font-size: 14px; font-weight: 400; color: var(--color-muted); }
+.hiring-fieldset .form-grid { clear: both; }
+.hiring-form .field { color: var(--color-navy); }
+
+.hiring-upload {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 72px;
+  padding: 14px 16px;
+  border: 1.5px dashed var(--color-line);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color .2s, background-color .2s;
+}
+.hiring-upload:hover, .hiring-upload:focus-within { border-color: var(--color-orange); background: var(--color-white); }
+.hiring-upload:focus-within { outline: 3px solid var(--color-orange-ink); outline-offset: 2px; }
+.hiring-upload input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.hiring-upload svg { flex: none; width: 26px; height: 26px; fill: none; stroke: var(--color-orange-ink); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.hiring-upload-text { display: grid; gap: 2px; min-width: 0; }
+.hiring-upload-text strong { font-size: 15px; font-weight: 600; overflow-wrap: anywhere; }
+.hiring-upload-text small { font-size: 13px; font-weight: 400; color: var(--color-muted); }
+.hiring-upload.has-file { border-style: solid; border-color: var(--color-mint-ink); background: var(--color-mint-wash); }
+.hiring-upload[aria-invalid=true] { border-color: var(--color-error); }
+
+/* Tick-lists and pick-one answers. Each answer sits in the same box as a text
+   field, so a row of them reads as part of the form and is big enough to tap.
+   The input rule is written through .field to beat the shared one in
+   global.css, which would otherwise stretch the box to the full width. */
+.hiring-choices { display: flex; flex-wrap: wrap; gap: 8px; }
+.hiring-choice {
+  display: inline-flex; align-items: center; gap: 9px;
+  min-height: 46px; padding: 10px 13px;
+  border: 1px solid var(--color-line); border-radius: 5px;
+  font-size: 15px; font-weight: 400; line-height: 1.35; color: var(--color-navy);
+  cursor: pointer; transition: border-color .2s, background-color .2s;
+}
+.hiring-choice:hover { border-color: var(--color-orange); background: var(--color-white); }
+.hiring-choice:focus-within { outline: 3px solid var(--color-orange-ink); outline-offset: 2px; }
+.hiring-choice:has(input:checked) { border-color: var(--color-mint-ink); background: var(--color-mint-wash); }
+.field .hiring-choice input {
+  flex: none; width: 17px; height: 17px; min-height: 0; margin: 0; padding: 0;
+  accent-color: var(--color-orange-ink);
+}
+.hiring-choice:has(input[aria-invalid=true]) { border-color: var(--color-error); }
+
+/* Step 2: the emailed code */
+.hiring-verify {
+  margin-top: 30px;
+  padding-top: 28px;
+  border-top: 1px solid var(--color-line);
+}
+.hiring-verify-title { font-size: 24px; color: var(--color-navy); margin-bottom: 10px; }
+.hiring-verify-title:focus { outline: none; }
+.hiring-verify > p:not(.form-message):not(.form-note) { font-size: 16px; line-height: 1.6; max-width: 52ch; }
+.hiring-verify strong { color: var(--color-navy); overflow-wrap: anywhere; }
+.hiring-code-field { margin-top: 22px; max-width: 280px; }
+.hiring-code-field input {
+  font-size: 24px;
+  letter-spacing: .3em;
+  font-variant-numeric: tabular-nums;
+  min-height: 58px;
+  text-align: center;
+}
+.hiring-code-field input::placeholder { font-size: 15px; letter-spacing: normal; }
+.hiring-verify-actions { display: flex; flex-wrap: wrap; gap: 4px 24px; margin-top: 14px; }
+.hiring-text-button {
+  min-height: 44px;
+  padding: 0;
+  background: none;
+  border: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-navy);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.hiring-text-button:disabled { cursor: default; opacity: 1; color: var(--color-muted); text-decoration: none; }
+.hiring-form fieldset:disabled { opacity: .55; }
+.hiring-apply .form-message a { text-decoration: underline; }
+
+/* Footer */
+.hiring-footer { background: var(--color-paper); border-top: 1px solid var(--color-line); }
+.hiring-footer-inner {
+  min-height: 72px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 24px;
+  padding-block: 16px;
+  font-size: 14px;
+  color: var(--color-muted);
+}
+.hiring-footer-inner p:first-child { color: var(--color-navy); font-weight: 600; }
+.hiring-footer-inner a { color: var(--color-navy); text-decoration: underline; text-underline-offset: 4px; }
+
+/* Phones */
+@media (max-width: 767px) {
+  .hiring-nav { min-height: 68px; }
+  .hiring-brand img { width: 124px; }
+  .hiring-page { padding-block: 44px 72px; }
+  .hiring-column { width: calc(100% - 32px); }
+  .hiring-block { margin-top: 44px; padding-top: 36px; }
+  .hiring-block > p, .hiring-ticks li { font-size: 16px; }
+  .hiring-block > p.hiring-lede { font-size: 17px; }
+  .hiring-facts li { flex: 1 1 140px; }
+  .hiring-apply-link { width: 100%; justify-content: space-between; }
+  .hiring-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hiring-metrics li { padding: 16px 14px; }
+  .hiring-metrics strong { font-size: 26px; }
+  .hiring-tags li { font-size: 14px; padding: 8px 13px; }
+  .hiring-form { padding: 22px 18px; margin-inline: -4px; }
+  .hiring-code-field { max-width: none; }
+  .hiring-office { grid-template-columns: 1fr; }
+  .hiring-notice { font-size: 15px; }
+}

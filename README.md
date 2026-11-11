@@ -41,6 +41,20 @@ Both the modal and contact section use the same Astro form component. Inputs use
 
 The endpoint includes a honeypot, validation, allowed service choices, origin checks, request-size limits, rate limits, email and CSV fallback. The copied diagnostic token was disabled. A failed email is logged and the enquiry is retained. If neither delivery nor storage succeeds, the endpoint returns an error instead of a false success. Storage is isolated from the sister site's directory.
 
+## Hiring page and applications
+
+`/hiring` (`src/pages/hiring.astro`, `src/styles/hiring.css`, `src/scripts/hiring.ts`) lists one job and takes applications through `public/api/apply.php`. The job text lives at the top of `hiring.astro`.
+
+Applying is two steps on the same page. The form and CV (PDF or Word, up to 5 MB) are checked and parked as a pending application, and a 6-digit code is emailed to the applicant. Once they type the code, the application is emailed to `clickfieldmedia@gmail.com` with the CV attached, the applicant's address in Reply-To. Codes expire after 15 minutes, allow 5 wrong tries and can be resent 3 times, 45 seconds apart. Recipient, sender, choices and limits are in the `hiring` block of `public/api/config.php`.
+
+Every sent application is also kept in the storage directory: `applications/applications.csv` plus the CV in `applications/cv/`. Unconfirmed applications are deleted after two hours. Code emails are rate limited per visitor and per address, so the form cannot be used to flood someone's inbox.
+
+Deployment checks:
+
+1. `public/api/.user.ini` raises PHP's upload limits to allow a 5 MB CV. Apache hosts running mod_php ignore that file; there, set `upload_max_filesize` to at least 8M and `post_max_size` to at least 10M in the hosting panel.
+2. Hostinger's `mail()` accepted code emails that Gmail never delivered, so both emails are sent by logging in to `clickfieldmedia@gmail.com` over SMTP. On the server, create `public_html/api/secrets.php` from `secrets.example.php` with a Google app password for that account. It is git-ignored and blocked from the web; a re-upload of `dist/` leaves it in place. Without it, the endpoint falls back to `mail()`. SMTP failures are logged as `smtp_failed` in `failures.log`, with the server's reply but never the password.
+3. Test once on the live site with a real address and a real CV: the code arrives, a wrong code is refused, and the application with its attachment reaches the Gmail inbox.
+
 ## Motion
 
 The hero signal tuner uses CSS material layers and an SVG waveform. Drag, tap, arrow keys, presets and the lock button change its five audience stages. The waveform updates only on input; the object has no timer, canvas, audio or ambient animation. Mobile rearranges the console into a compact 310px-wide control surface with touch targets of at least 44px and native vertical swiping through the dial.

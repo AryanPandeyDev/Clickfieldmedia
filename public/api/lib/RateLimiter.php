@@ -94,9 +94,10 @@ final class RateLimiter
      * or the inbox. A fixed window, which is cheaper than a sliding one and
      * precise enough for a limit real traffic should never approach.
      */
-    public function consumeGlobal(array $rule): ?array
+    public function consumeGlobal(array $rule, string $name = 'global'): ?array
     {
-        return $this->storage->withJson('ratelimit-global.json', static function (?array $state) use ($rule) {
+        $file = 'ratelimit-' . preg_replace('/[^a-z]/', '', $name) . '.json';
+        return $this->storage->withJson($file, static function (?array $state) use ($rule) {
             if ($state === null) {
                 return null;
             }

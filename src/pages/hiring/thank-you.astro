@@ -1,0 +1,80 @@
+---
+import Base from '../../layouts/Base.astro';
+import { company } from '../../data/site';
+import '../../styles/thank-you.css';
+
+// Where the /hiring form sends an applicant once their application is sent.
+// Its own URL, apart from the enquiry /thank-you/, so Meta and GA4 can count
+// job applications by page without mixing them in with sales leads.
+---
+<Base title="Application received | Clickfield Media" faqSchema={false} noindex whatsapp={false}>
+  <header class="thank-you-header">
+    <div class="shell thank-you-nav">
+      <a class="thank-you-brand" href="/" aria-label="Clickfield Media home">
+        <img src="/logo-navy.webp" alt="Clickfield Media" width="528" height="164" />
+      </a>
+      <nav class="thank-you-nav-links" aria-label="Main navigation">
+        <a class="thank-you-nav-secondary" href="/#services">What we do</a>
+        <a class="thank-you-nav-secondary" href="/#results">Our work</a>
+        <a class="thank-you-back" href="/"><span aria-hidden="true">←</span> Back to website</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="thank-you-page">
+    <div class="shell thank-you-layout">
+      <div class="thank-you-scroll">
+        <div class="thank-you-curl thank-you-curl-top" aria-hidden="true"></div>
+        <article class="thank-you-paper" aria-labelledby="thank-you-title">
+          <div class="thank-you-paper-content">
+            <div class="thank-you-confirmation-mark" aria-hidden="true">
+              <svg viewBox="0 0 32 32" fill="none"><path d="m9 16 5 5 10-11" /></svg>
+            </div>
+            <p class="thank-you-received">Application received</p>
+            <h1 id="thank-you-title">Thank you<span data-applicant-name></span>!</h1>
+            <p class="thank-you-lede">We’ve received your application and CV. If your experience is a good fit, we’ll get in touch by email or phone.</p>
+            <div class="thank-you-paper-signoff">
+              <span>Speak soon,</span>
+              <strong>The Clickfield team</strong>
+            </div>
+            <div class="thank-you-contact">
+              <p>Questions about the role?</p>
+              <div class="thank-you-contact-links">
+                <a href={`mailto:${company.careersEmail}`}>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 6 9 7 9-7" /></svg>
+                  Email us
+                </a>
+              </div>
+            </div>
+          </div>
+        </article>
+        <div class="thank-you-curl thank-you-curl-bottom" aria-hidden="true"></div>
+      </div>
+    </div>
+  </main>
+  <footer class="thank-you-footer">
+    <div class="shell thank-you-footer-inner">
+      <p>Clickfield Media</p>
+      <p>Marketing + software. Built together.</p>
+    </div>
+  </footer>
+  {/* The form leaves the applicant's first name and role in sessionStorage on
+      its way here. The events fire from this page, like the enquiry Lead does,
+      so they are not lost to the navigation. */}
+  <script is:inline>
+    (function () {
+      var applied = null;
+      try {
+        applied = JSON.parse(sessionStorage.getItem('cf-applied') || 'null');
+        sessionStorage.removeItem('cf-applied');
+      } catch (e) {}
+      var role = (applied && applied.role) || '';
+      if (applied && applied.name) {
+        var name = document.querySelector('[data-applicant-name]');
+        if (name) name.textContent = ', ' + applied.name;
+      }
+      if (typeof fbq === 'function') fbq('trackCustom', 'JobApplication', { role: role });
+      if (typeof gtag === 'function') gtag('event', 'apply_submitted', { role: role });
+    })();
+  </script>
+</Base>

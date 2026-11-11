@@ -7,6 +7,11 @@ declare(strict_types=1);
  *
  * Error copy is written to be actionable on screen: it names the field in the
  * words used on the form and says what is wrong, rather than "invalid input".
+ *
+ * Every field is cleaned before any of them is judged, so a rejected
+ * submission still comes back with everything the visitor managed to type.
+ * The endpoint records that, which is the difference between a half-filled
+ * form being a lead we can still chase and a lead we never knew about.
  */
 final class Validator
 {
@@ -26,70 +31,75 @@ final class Validator
     }
 
     /**
-     * Returns ['data' => [...]] on success, or ['error' => [...]] describing
-     * the first field that failed, ready to hand to Http::failure().
+     * Returns ['data' => [...]] on success, or ['error' => [...], 'data' => [...]]
+     * describing the first field that failed, ready to hand to Http::failure(),
+     * alongside whatever was readable.
      */
     public function validate(array $input): array
     {
         $data = [];
+        $raw = [];
+        $malformed = [];
+
+        // --- Pass one: read everything, judge nothing -----------------------
 
         foreach ($this->fields as $key => $label) {
-            $raw = $input[$key] ?? '';
+            $value = $input[$key] ?? '';
 
             // An array here means someone posted name[]=… to probe the code.
-            if (!is_string($raw)) {
-                return ['error' => [
-                    'code' => 'malformed_field',
-                    'field' => $key,
-                    'message' => "The “{$label}” field was not sent correctly. Please reload the page and try again.",
-                ]];
+            // Recorded as blank so the rest of the form still comes through.
+            if (!is_string($value)) {
+                $malformed[$key] = true;
+                $raw[$key] = '';
+                $data[$key] = '';
+                continue;
             }
 
-            $value = $this->clean($raw);
+            $raw[$key] = $value;
+            $data[$key] = $this->clean($value);
+        }
 
-            if ($value === '' && $key !== 'message') {
-                return ['error' => [
-                    'code' => 'missing_field',
-                    'field' => $key,
-                    'message' => self::MESSAGES[$key] ?? "Please fill in the “{$label}” field.",
-                ]];
+        // --- Pass two: the first problem, in the order of the form ----------
+
+        foreach ($this->fields as $key => $label) {
+            if (isset($malformed[$key])) {
+                return $this->reject($data, 'malformed_field', $key, "The “{$label}” field was not sent correctly. Please reload the page and try again.");
+            }
+
+            if ($data[$key] === '' && $key !== 'message') {
+                return $this->reject($data, 'missing_field', $key, self::MESSAGES[$key] ?? "Please fill in the “{$label}” field.");
             }
 
             // Measured after trimming, so trailing whitespace alone never
             // pushes an otherwise fine value over the limit.
-            if (mb_strlen(trim($raw)) > $this->maxLen) {
-                return ['error' => [
-                    'code' => 'field_too_long',
-                    'field' => $key,
-                    'message' => "That “{$label}” is longer than we can accept. Please shorten it.",
-                ]];
+            if (mb_strlen(trim($raw[$key])) > $this->maxLen) {
+                return $this->reject($data, 'field_too_long', $key, "That “{$label}” is longer than we can accept. Please shorten it.");
             }
-
-            $data[$key] = $value;
         }
 
         if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-            return ['error' => [
-                'code' => 'invalid_email',
-                'field' => 'email',
-                'message' => 'That email address does not look right. Please check it and try again.',
-            ]];
+            return $this->reject($data, 'invalid_email', 'email', 'That email address does not look right. Please check it and try again.');
         }
 
         if (!in_array($data['service'], ['Marketing', 'Software', 'Marketing + software', 'Help me decide'], true)) {
-            return ['error' => ['code' => 'invalid_service', 'field' => 'service', 'message' => 'Please choose one of the available services.']];
+            return $this->reject($data, 'invalid_service', 'service', 'Please choose one of the available services.');
         }
 
         // Enough digits to be a real number, ignoring spaces, +, dashes.
         if (preg_match_all('/\d/', $data['phone']) < 7) {
-            return ['error' => [
-                'code' => 'invalid_phone',
-                'field' => 'phone',
-                'message' => 'That phone number looks too short. Please include the full number.',
-            ]];
+            return $this->reject($data, 'invalid_phone', 'phone', 'That phone number looks too short. Please include the full number.');
         }
 
         return ['data' => $data];
+    }
+
+    /** A refusal, carrying the readable part of the submission with it. */
+    private function reject(array $data, string $code, string $field, string $message): array
+    {
+        return [
+            'data' => $data,
+            'error' => ['code' => $code, 'field' => $field, 'message' => $message],
+        ];
     }
 
     /**

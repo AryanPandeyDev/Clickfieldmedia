@@ -1,6 +1,7 @@
 export const company = {
   name: 'Clickfield Media',
   email: 'info@clickfieldmedia.com',
+  careersEmail: 'clickfieldmedia@gmail.com',
   phone: '+91 63937 35033',
   telephone: '+916393735033',
   address: '3/245, Vijayant Khand, Gomti Nagar, Lucknow 226010',

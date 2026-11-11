@@ -23,6 +23,7 @@ require_once __DIR__ . '/lib/Logger.php';
 require_once __DIR__ . '/lib/Http.php';
 require_once __DIR__ . '/lib/RateLimiter.php';
 require_once __DIR__ . '/lib/Validator.php';
+require_once __DIR__ . '/lib/Smtp.php';
 require_once __DIR__ . '/lib/Mailer.php';
 
 $config = require __DIR__ . '/config.php';

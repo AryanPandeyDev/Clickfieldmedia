@@ -1,5 +1,6 @@
-# Rules for the enquiry API. Only contact.php is meant to be reachable from
-# the web; everything else in here is included by it, never requested.
+# Rules for the enquiry API. Only contact.php (enquiries) and apply.php (job
+# applications) are meant to be reachable from the web; everything else in
+# here is included by them, never requested.
 
 # --- Never cache an API reply -------------------------------------------
 # The site-wide .htaccess sets ExpiresDefault to a month, and application/json
@@ -23,14 +24,14 @@
 # config.php holds the destination address, bootstrap.php and lib/ hold the
 # logic. Apache would run them as empty pages rather than leaking source, but
 # there is no reason for them to answer a request at all.
-<FilesMatch "^(config|bootstrap)\.php$">
+<FilesMatch "^(config|bootstrap|secrets|secrets\.example)\.php$">
   Require all denied
 </FilesMatch>
 
 # --- Nothing under lib/ or storage/ is fetchable -------------------------
 RedirectMatch 404 ^/api/(lib|storage)/
 
-<FilesMatch "\.(csv|log|json|md|bak|1)$">
+<FilesMatch "(\.(csv|log|json|md|bak|1)|^\.user\.ini)$">
   Require all denied
 </FilesMatch>
 

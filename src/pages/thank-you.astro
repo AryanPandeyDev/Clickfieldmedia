@@ -36,11 +36,10 @@ const CALENDLY_URL: string | null =
             <h1 id="thank-you-title">Thank you!</h1>
             <p class="thank-you-lede">We’re glad you reached out. We’ll review your details and get back to you with a useful next step.</p>
             {CALENDLY_URL && (
-              <p class="thank-you-book">
-                <span class="thank-you-spinner" aria-hidden="true"></span>
-                Taking you to the calendar…
-              </p>
-              <p class="thank-you-book-fallback">Not moving? <a href={CALENDLY_URL}>Open the calendar</a>.</p>
+              <a class="button button-primary thank-you-book" href={CALENDLY_URL}>
+                Choose a time to talk
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 14 0m-5-5 5 5-5 5" /></svg>
+              </a>
             )}
             <div class="thank-you-paper-signoff">
               <span>Speak soon,</span>
@@ -74,12 +73,9 @@ const CALENDLY_URL: string | null =
   </footer>
   {CALENDLY_URL && (
     <Fragment>
-      {/* Records the lead, then hands off to Calendly. The hand-off waits for
-          Google to confirm the event (the tag may still be loading), but never
-          longer than 1.5s. replace(), not assign(): pressing Back from Calendly
-          should reach the page they came from, not bounce back through here. */}
-      <script is:inline set:html={`(function(){var done=false;function go(){if(done)return;done=true;location.replace(${JSON.stringify(CALENDLY_URL)});}if(typeof gtag==='function'){gtag('event','generate_lead',{event_callback:go,event_timeout:1200});}setTimeout(go,1500);})();`} />
-      <noscript><meta http-equiv="refresh" content={`0;url=${CALENDLY_URL}`} /></noscript>
+      {/* Records the enquiry as a lead. Calendly remains an optional next step,
+          so the visitor chooses whether to open it. */}
+      <script is:inline>{`if(typeof fbq==='function'){fbq('track','Lead');}if(typeof gtag==='function'){gtag('event','generate_lead');}`}</script>
     </Fragment>
   )}
 </Base>

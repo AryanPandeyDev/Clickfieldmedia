@@ -126,6 +126,9 @@
     const isDark = (start: Element | null) => {
       let node: Element | null = start;
       while (node && node !== document.documentElement) {
+        // A surface painted by a separate layer (the industries colour bar) names itself.
+        const hint = (node as HTMLElement).dataset?.cursorSurface;
+        if (hint) return hint === 'dark';
         const style = getComputedStyle(node);
         const fill = style.backgroundColor.match(/[\d.]+/g);
         if (fill && fill.length >= 3 && (fill.length < 4 || Number(fill[3]) > 0.5)) {

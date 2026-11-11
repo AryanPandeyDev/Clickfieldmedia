@@ -1,0 +1,42 @@
+---
+import '../styles/industries.css';
+// Each industry carries its own highlight colour from the site palette. `ink` is
+// the text colour that stays readable on it, and `surface` tells the custom
+// cursor whether to switch to its light version while it sits on that colour.
+const industries = [
+  { name: 'Real estate', tint: 'var(--color-navy)', ink: 'var(--color-white)', surface: 'dark', line: 'Site visits, not just form fills.', tags: ['Meta & Google ads', 'Landing pages', 'Custom CRMs'],
+    icon: '<rect x="4" y="3" width="11" height="18" rx="1"/><path d="M15 9h4a1 1 0 0 1 1 1v11M8 7h3M8 11h3M8 15h3M3 21h18"/>' },
+  { name: 'SaaS', tint: 'var(--color-plum)', ink: 'var(--color-white)', surface: 'dark', line: 'Trials that turn into paid plans.', tags: ['Google ads', 'SEO', 'Landing pages'],
+    icon: '<rect x="4" y="5" width="16" height="11" rx="1.5"/><path d="M2 19h20"/>' },
+  { name: 'Healthcare', tint: 'var(--color-mint-ink)', ink: 'var(--color-white)', surface: 'dark', line: 'Patients who find you and book.', tags: ['Google ads', 'SEO', 'Websites'],
+    icon: '<path d="M20.5 8.6c0 5.2-8.5 10.4-8.5 10.4S3.5 13.8 3.5 8.6A4.3 4.3 0 0 1 12 6.8a4.3 4.3 0 0 1 8.5 1.8Z"/><path d="M4 12h4l1.6-3 2.6 6 1.8-3h6"/>' },
+  { name: 'E-commerce', tint: 'var(--color-orange)', ink: 'var(--color-navy-deep)', surface: 'dark', line: 'More sales from the same spend.', tags: ['Meta ads', 'Ad creative', 'Tracking'],
+    icon: '<path d="M3 4h2.5l2.2 10.5a1.5 1.5 0 0 0 1.5 1.2h8.3a1.5 1.5 0 0 0 1.5-1.1L21 8H6.3"/><circle cx="9.5" cy="19.5" r="1.2"/><circle cx="17" cy="19.5" r="1.2"/>' },
+  { name: 'Education', tint: 'var(--color-amber)', ink: 'var(--color-navy)', surface: 'light', line: 'Admission enquiries every intake.', tags: ['Meta & Google ads', 'Landing pages', 'Custom CRMs'],
+    icon: '<path d="M12 6.5C10 5 7 4.5 3.5 5v13c3.5-.5 6.5 0 8.5 1.5 2-1.5 5-2 8.5-1.5V5C17 4.5 14 5 12 6.5Zm0 0v13"/>' },
+  { name: 'Professional services', tint: 'var(--color-charcoal)', ink: 'var(--color-white)', surface: 'dark', line: 'A steady run of client enquiries.', tags: ['SEO', 'Google ads', 'Websites'],
+    icon: '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M3 12.5h18"/>' },
+  { name: 'D2C / beauty', tint: 'var(--color-coral)', ink: 'var(--color-navy)', surface: 'light', line: 'Launches people stop scrolling for.', tags: ['Ad creative', 'Social', 'Meta ads'],
+    icon: '<path d="m10 3.5 1.8 4.7 4.7 1.8-4.7 1.8-1.8 4.7-1.8-4.7L3.5 10l4.7-1.8Z"/><path d="m18 14.5.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9Z"/>' },
+];
+---
+<section id="industries" class="industries-section section" aria-labelledby="industries-title">
+  <div class="shell">
+    <div class="section-head"><div><span class="section-tag tag-plum">Industries we serve</span><h2 id="industries-title">Your market.<br />Our homework.</h2></div><p>We’ve done the work in these industries, so we start from what already works for them.</p></div>
+    <div class="industry-board" data-industries>
+      <span class="industry-glide" aria-hidden="true"></span>
+      <ul class="industry-list">
+        {industries.map((item, i) => (
+          <li class="industry" style={`--tint:${item.tint};--ink:${item.ink}`} data-surface={item.surface}>
+            <span class="industry-number" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+            <span class="industry-icon" aria-hidden="true"><svg viewBox="0 0 24 24" set:html={item.icon} /></span>
+            <div class="industry-copy"><h3>{item.name}</h3><p class="industry-detail"><span class="industry-line">{item.line}</span><span class="industry-tags">{item.tags.map(tag => <span>{tag}</span>)}</span></p></div>
+            <span class="industry-arrow" aria-hidden="true">↗</span>
+          </li>
+        ))}
+      </ul>
+      <div class="industry-card" aria-hidden="true"><span class="industry-card-label">What we do here</span><p class="industry-card-line"></p><div class="industry-card-tags industry-tags"></div></div>
+    </div>
+    <a class="text-link industry-more" href="#contact" data-open-enquiry>Don’t see yours? Tell us about it <span aria-hidden="true">↗</span></a>
+  </div>
+</section>

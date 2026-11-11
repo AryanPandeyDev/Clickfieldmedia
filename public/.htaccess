@@ -3,14 +3,14 @@ DirectoryIndex index.html
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
-  # Normalize explicit requests for the two generated HTML pages in one hop.
+  # Normalize explicit requests for the generated HTML pages in one hop.
   # THE_REQUEST excludes Apache's internal DirectoryIndex lookup, avoiding loops.
   # Restrict these rules to this site's production hosts, leaving previews and
   # independently hosted sister subdomains alone. Query strings are kept.
   RewriteCond %{HTTP_HOST} ^(?:www\.)?clickfieldmedia\.com(?::[0-9]+)?$ [NC]
   RewriteCond %{REQUEST_METHOD} ^(?:GET|HEAD)$
-  RewriteCond %{THE_REQUEST} \s/+(?:thank-you/)?index\.html[?\s]
-  RewriteRule ^(thank-you/)?index\.html$ https://clickfieldmedia.com/$1 [R=301,L]
+  RewriteCond %{THE_REQUEST} \s/+(?:thank-you/|hiring/(?:thank-you/|video-editor/)?)?index\.html[?\s]
+  RewriteRule ^(thank-you/|hiring/(?:thank-you/|video-editor/)?)?index\.html$ https://clickfieldmedia.com/$1 [R=301,L]
 
   # 308 preserves the method and body if an API request uses a noncanonical host.
   RewriteCond %{HTTP_HOST} ^www\.clickfieldmedia\.com(?::[0-9]+)?$ [NC]

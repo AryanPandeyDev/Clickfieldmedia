@@ -4,9 +4,36 @@
     {
       "name": "clickfield-dev",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
       "port": 4321,
       "url": "http://127.0.0.1:4321"
+    },
+    {
+      "name": "clickfield-network",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "--",
+        "--host"
+      ],
+      "port": 4321
+    },
+    {
+      "name": "clickfield-preview-alt",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "preview",
+        "--",
+        "--port",
+        "4325"
+      ],
+      "port": 4325,
+      "url": "http://127.0.0.1:4325"
     }
   ]
 }

@@ -5,3 +5,4 @@ dist/
 artifacts/
 clickfield-agency-data/
 *.log
+public/api/secrets.php

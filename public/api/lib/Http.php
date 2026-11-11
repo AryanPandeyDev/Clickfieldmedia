@@ -99,8 +99,11 @@ final class Http
         header_remove('X-Powered-By');
     }
 
-    /** Success. JSON callers get a flag, form posts get the thank-you page. */
-    public function success(): never
+    /**
+     * Success. JSON callers get a flag, plus anything in $extra; form posts get
+     * the thank-you page.
+     */
+    public function success(array $extra = []): never
     {
         $this->baseHeaders();
 
@@ -111,7 +114,7 @@ final class Http
                 'ok' => true,
                 'ref' => $this->requestId,
                 'redirect' => $this->thankYou,
-            ], JSON_UNESCAPED_UNICODE);
+            ] + $extra, JSON_UNESCAPED_UNICODE);
             exit;
         }
 

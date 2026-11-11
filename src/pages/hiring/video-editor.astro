@@ -1,0 +1,222 @@
+---
+import Base from '../../layouts/Base.astro';
+import { company } from '../../data/site';
+import '../../styles/hiring.css';
+
+// The job post, word for word as supplied. Edit here to change the listing.
+// The answers the form offers below must match this role's block in
+// api/config.php, or the server refuses the application.
+const job = {
+  title: 'Video Editor',
+  experience: '1–2+ Years',
+  type: 'Full-Time',
+  salary: '₹3–6 LPA',
+  workMode: 'Work from office',
+  timing: '10 AM to 6 PM',
+  about: 'We are looking for a skilled and creative Video Editor to join our team on an in-house basis. You will cut everything we put out — reels, ads, social content and long-form videos — and take a brief from idea to finished edit on your own.',
+  work: [
+    'Reels and short-form videos for social media',
+    'Ads and campaign videos for our clients',
+    'Long-form videos for YouTube and client channels',
+    'Motion graphics and typography that carry the story',
+    'Colour correction, sound design and audio mixing on your own edits',
+  ],
+  requirements: [
+    '1–2+ years of professional video editing experience',
+    'Strong proficiency in Adobe Premiere Pro and After Effects',
+    'Good knowledge of motion graphics and typography',
+    'Experience with camera tracking, 3D camera tracking and rotoscoping',
+    'Knowledge of AI video generation and AI-assisted editing tools',
+    'Good understanding of colour correction, sound design and audio mixing',
+    'Experience editing reels, ads, social media content and long-form videos',
+  ],
+  tools: [
+    'Premiere Pro', 'After Effects', 'Motion Graphics', 'Typography', 'Rotoscoping',
+    'Camera Tracking', '3D Camera Tracking', 'AI Video Tools', 'Colour Grading', 'Sound Design', 'Audio Mixing',
+  ],
+  ideal: [
+    'A strong sense of visual storytelling, pacing, transitions and composition',
+    'Able to take a creative brief and carry it out independently',
+    'Good attention to detail, and comfortable working to a deadline',
+    'Experience with marketing or advertising content is a plus',
+  ],
+};
+const experienceOptions = ['Less than 1 year', '1 to 2 years', '2 to 4 years', 'More than 4 years'];
+const noticeOptions = ['Can join immediately', '15 days', '30 days', '60 days', '90 days or more'];
+const softwareOptions = [
+  'Adobe Premiere Pro', 'Adobe After Effects', 'DaVinci Resolve',
+  'Final Cut Pro', 'Blender or other 3D', 'CapCut', 'Something else',
+];
+const laptopOptions = ['Yes, I have my own laptop for professional editing', 'No, I do not have one'];
+---
+<Base title={`${job.title} | Careers at Clickfield Media`} description={`${company.name} is hiring an in-house ${job.title} (${job.experience}, ${job.type}) for reels, ads, social content and long-form video, on Premiere Pro and After Effects.`} faqSchema={false} whatsapp={false}>
+  <header class="hiring-header">
+    <div class="shell hiring-nav">
+      <a class="hiring-brand" href="/" aria-label="Clickfield Media home"><img src="/logo-navy.webp" alt="Clickfield Media" width="528" height="164" /></a>
+      <a class="hiring-back" href="/"><span aria-hidden="true">←</span> Back to website</a>
+    </div>
+  </header>
+
+  <main id="main" class="hiring-page">
+    <div class="hiring-column">
+      <section class="hiring-intro" aria-labelledby="job-title">
+        <span class="section-tag tag-amber">We’re hiring</span>
+        <h1 id="job-title">{job.title}</h1>
+        <ul class="hiring-facts" aria-label="Role details">
+          <li><span>Experience</span>{job.experience}</li>
+          <li><span>Employment type</span>{job.type}</li>
+          <li><span>Salary</span>{job.salary}</li>
+          <li><span>Work mode</span>{job.workMode}</li>
+          <li><span>Office timing</span>{job.timing}</li>
+        </ul>
+        <p class="hiring-notice"><strong>This is a work-from-office job in Lucknow.</strong> There is no work from home or remote option. Please apply only if you can come to our office every working day.</p>
+        <a class="button button-primary hiring-apply-link" href="#apply">Apply now <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14m-5-5 5 5 5-5" /></svg></a>
+      </section>
+
+      <section class="hiring-block" aria-labelledby="about-title">
+        <h2 id="about-title">Job description</h2>
+        <p class="hiring-lede">{job.about}</p>
+      </section>
+
+      <section class="hiring-block" aria-labelledby="work-title">
+        <h2 id="work-title">What you’ll be working on</h2>
+        <ul class="hiring-ticks">{job.work.map(item => <li>{item}</li>)}</ul>
+      </section>
+
+      <section class="hiring-block" aria-labelledby="requirements-title">
+        <h2 id="requirements-title">Job requirements</h2>
+        <ul class="hiring-ticks">{job.requirements.map(item => <li>{item}</li>)}</ul>
+      </section>
+
+      <section class="hiring-block" aria-labelledby="tools-title">
+        <h2 id="tools-title">Software and skills</h2>
+        <p>The tools and craft we expect you to be comfortable with:</p>
+        <ul class="hiring-tags">{job.tools.map(tool => <li>{tool}</li>)}</ul>
+      </section>
+
+      <section class="hiring-block" aria-labelledby="ideal-title">
+        <h2 id="ideal-title">Ideal candidate</h2>
+        <ul class="hiring-ticks">{job.ideal.map(item => <li>{item}</li>)}</ul>
+      </section>
+
+      <section class="hiring-block" aria-labelledby="rules-title">
+        <h2 id="rules-title">Two things to know before you apply</h2>
+        <p class="hiring-notice"><strong>Your own laptop is mandatory.</strong> It has to handle professional editing work — we do not provide one.</p>
+        <p class="hiring-notice"><strong>Professional editing software is required.</strong> We are not considering CapCut-only editors. Your work should be cut in Premiere Pro, After Effects or an equivalent professional tool.</p>
+      </section>
+
+      <section class="hiring-block" aria-labelledby="office-title">
+        <h2 id="office-title">Office address & timing</h2>
+        <div class="hiring-office">
+          <div>
+            <span class="hiring-office-label">Office address</span>
+            <address><a href={company.map} target="_blank" rel="noopener noreferrer">3/245, Vijayant Khand<br />Gomti Nagar, Lucknow 226010<br />Uttar Pradesh, India</a></address>
+            <span class="hiring-office-note">Behind Chandan Hospital</span>
+          </div>
+          <div>
+            <span class="hiring-office-label">Office timing</span>
+            <p class="hiring-office-value">{job.timing}</p>
+            <span class="hiring-office-note">{job.workMode} only. No work from home or remote.</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="apply" class="hiring-block hiring-apply" aria-labelledby="apply-title">
+        <h2 id="apply-title">Apply for this role</h2>
+        <p>Fill in your details, link your showreel and upload your CV. We’ll send a 6-digit code to your email to confirm it’s really you.</p>
+
+        <noscript><p class="form-message">This form needs JavaScript to verify your email. You can also email your CV and showreel to <a href={`mailto:${company.careersEmail}`}>{company.careersEmail}</a>.</p></noscript>
+        <form class="hiring-form" action="/api/apply.php" method="post" enctype="multipart/form-data" data-apply-form>
+          <input type="hidden" name="role" value={job.title} />
+          <div class="form-honeypot" aria-hidden="true"><label>Leave empty<input name="website" tabindex="-1" autocomplete="off" /></label></div>
+
+          <fieldset class="hiring-fieldset">
+            <legend>About you</legend>
+            <div class="form-grid">
+              <label class="field"><span>Full name</span><input name="name" autocomplete="name" required maxlength="100" placeholder="Your full name" /></label>
+              <label class="field"><span>Email</span><input name="email" type="email" autocomplete="email" required maxlength="200" placeholder="you@example.com" /></label>
+              <label class="field"><span>Phone number</span><input name="phone" type="tel" inputmode="tel" autocomplete="tel" required minlength="7" maxlength="24" pattern="[+0-9() .\-]{7,24}" placeholder="+91" /></label>
+              <label class="field"><span>City you live in</span><input name="city" autocomplete="address-level2" required maxlength="100" placeholder="e.g. Lucknow" /></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="hiring-fieldset">
+            <legend>Your work</legend>
+            <div class="form-grid">
+              <label class="field form-wide"><span>Years of professional editing experience</span><select name="experience" required><option value="" disabled selected>Select</option>{experienceOptions.map(option => <option>{option}</option>)}</select></label>
+              <label class="field"><span>Current or most recent job title</span><input name="job_title" autocomplete="organization-title" required maxlength="150" placeholder="e.g. Video Editor" /></label>
+              <label class="field"><span>Company</span><input name="company" autocomplete="organization" required maxlength="150" placeholder="Company, studio or freelance" /></label>
+              <label class="field form-wide"><span>Showreel or portfolio link</span><input name="portfolio" type="url" inputmode="url" required maxlength="300" placeholder="YouTube, Vimeo, Drive, Behance or Instagram" /></label>
+              <div class="field form-wide">
+                <span id="software-label">Software you edit on <span class="optional">(tick everything you use)</span></span>
+                <div class="hiring-choices" role="group" aria-labelledby="software-label">
+                  {softwareOptions.map(option => (
+                    <label class="hiring-choice"><input type="checkbox" name="software[]" value={option} data-tick-group />{option}</label>
+                  ))}
+                </div>
+              </div>
+              <div class="field form-wide">
+                <span id="laptop-label">Do you have your own laptop for professional editing?</span>
+                <div class="hiring-choices" role="radiogroup" aria-labelledby="laptop-label">
+                  {laptopOptions.map(option => (
+                    <label class="hiring-choice"><input type="radio" name="laptop" value={option} required />{option}</label>
+                  ))}
+                </div>
+              </div>
+              <div class="field form-wide">
+                <span id="cv-label">Your CV</span>
+                <label class="hiring-upload" data-upload>
+                  <input name="cv" type="file" required accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-labelledby="cv-label" aria-describedby="cv-hint" data-upload-input />
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m-5 5 5-5 5 5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3" /></svg>
+                  <span class="hiring-upload-text"><strong data-upload-name>Choose a file</strong><small id="cv-hint">PDF or Word, up to 5 MB</small></span>
+                </label>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="hiring-fieldset">
+            <legend>A little more <span class="optional">(optional)</span></legend>
+            <div class="form-grid">
+              <label class="field"><span>Current salary (CTC)</span><input name="current_ctc" maxlength="60" placeholder="e.g. 2.4 LPA" /></label>
+              <label class="field"><span>Expected salary (CTC)</span><input name="expected_ctc" maxlength="60" placeholder="e.g. 4 LPA" /></label>
+              <label class="field"><span>Notice period</span><select name="notice"><option value="" selected>Select</option>{noticeOptions.map(option => <option>{option}</option>)}</select></label>
+              <label class="field"><span>LinkedIn profile</span><input name="linkedin" type="url" inputmode="url" maxlength="300" placeholder="https://www.linkedin.com/in/your-name" /></label>
+              <label class="field form-wide"><span>Tell us about a video you edited and what you did on it</span><textarea name="message" rows="4" maxlength="2000" placeholder="The brief, what you cut, the effects or graphics you built, and how it performed."></textarea></label>
+            </div>
+          </fieldset>
+
+          <div data-apply-step="details">
+            <p class="form-message" data-form-message role="status" tabindex="-1" hidden></p>
+            <button class="button button-primary form-submit" type="submit"><span data-submit-text>Verify email and continue</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 14 0m-5-5 5 5-5 5" /></svg></button>
+            <p class="form-note">We’ll only use your details to consider you for this role.</p>
+          </div>
+
+          <div class="hiring-verify" data-apply-step="code" hidden>
+            <h3 class="hiring-verify-title" tabindex="-1" data-verify-title>Check your email</h3>
+            <p>We sent a 6-digit code to <strong data-verify-email></strong>. Enter it below to send your application.</p>
+            <label class="field hiring-code-field"><span>Verification code</span><input name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" placeholder="6-digit code" data-code-input disabled /></label>
+            <p class="form-message" data-code-message role="status" tabindex="-1" hidden></p>
+            <button class="button button-primary form-submit" type="submit"><span data-verify-text>Confirm and send application</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 14 0m-5-5 5 5-5 5" /></svg></button>
+            <div class="hiring-verify-actions">
+              <button type="button" class="hiring-text-button" data-resend>Resend code</button>
+              <button type="button" class="hiring-text-button" data-change-details>Change my details</button>
+            </div>
+            <p class="form-note">Can’t find it? Check your spam or promotions folder.</p>
+          </div>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <footer class="hiring-footer">
+    <div class="shell hiring-footer-inner">
+      <p>Clickfield Media</p>
+      <p>Questions about the role? <a href={`mailto:${company.careersEmail}`}>{company.careersEmail}</a></p>
+    </div>
+  </footer>
+
+  <script>
+    import { initApplyForm } from '../../scripts/hiring';
+    initApplyForm();
+  </script>
+</Base>

@@ -1,0 +1,43 @@
+.industries-section{background:var(--color-putty)}
+.industry-board{position:relative}
+.industry-list{list-style:none;margin:0;padding:0;position:relative;z-index:1}
+.industry{display:grid;grid-template-columns:2.4rem 2.4rem minmax(0,1fr) auto;align-items:center;gap:16px;padding:22px 20px;border-top:1px solid var(--color-line);color:var(--color-navy);transition:color .3s,background-color .3s,border-color .3s}
+.industry:last-child{border-bottom:1px solid var(--color-line)}
+.industry-number{font-family:var(--font-display);font-size:15px;color:var(--color-plum);transition:color .3s}
+.industry-icon svg{display:block;width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.industry h3{font-size:clamp(1.9rem,4.6vw,4.3rem);letter-spacing:-.045em;line-height:1}
+.industry-detail{display:grid;gap:10px;margin-top:10px;font-size:15px;color:var(--color-muted);transition:color .3s}
+.industry-tags{display:flex;flex-wrap:wrap;gap:6px}
+.industry-tags span{padding:3px 9px;border-radius:5px;border:1px solid var(--color-line);background:var(--color-paper);color:var(--color-navy);font-size:12px;font-weight:500}
+.industry-arrow{font-size:28px;opacity:0;transition:opacity .3s}
+.industry-more{margin-top:36px}
+
+/* Without the script (touch screens, reduced motion) a row simply takes its colour on hover. */
+@media(hover:hover){
+  .industry-board:not(.is-gliding) .industry:hover{border-radius:14px;background:var(--tint);color:var(--ink);border-color:transparent}
+  .industry-board:not(.is-gliding) .industry:hover+.industry{border-top-color:transparent}
+  .industry-board:not(.is-gliding) .industry:hover :is(.industry-number,.industry-detail){color:inherit}
+  .industry-board:not(.is-gliding) .industry:hover .industry-arrow{opacity:1}
+}
+
+/* With the script, one colour bar glides between rows and a card follows the pointer. */
+.industry-glide,.industry-card{display:none}
+.is-gliding .industry-glide{display:block;position:absolute;left:0;top:0;width:100%;height:0;border-radius:14px;background:var(--color-navy);transform:scaleX(0);transform-origin:left center;pointer-events:none;z-index:0}
+.is-gliding .industry{transition:color .35s,border-color .35s}
+.is-gliding .industry.is-active{color:var(--ink);border-color:transparent}
+.is-gliding .industry.is-active+.industry{border-top-color:transparent}
+.is-gliding .industry.is-active .industry-number{color:inherit}
+.is-gliding .industry-arrow{transition:none}
+.is-gliding .industry-detail{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;margin:0}
+.is-gliding .industry-card{display:block;position:absolute;left:0;top:0;z-index:2;width:300px;padding:16px 18px 18px;border:1px solid var(--color-line);border-radius:14px;background:var(--color-paper);box-shadow:0 18px 40px var(--color-bezel-shadow);pointer-events:none;opacity:0;visibility:hidden}
+.industry-card-label{font-size:12px;font-weight:500;color:var(--color-plum)}
+.industry-card-line{margin:6px 0 14px;font-family:var(--font-display);font-size:22px;font-weight:500;line-height:1.12;letter-spacing:-.03em;color:var(--color-navy)}
+
+@media(max-width:639px){
+  .industry{grid-template-columns:30px minmax(0,1fr);gap:12px;padding:20px 0;align-items:start}
+  .industry-number,.industry-arrow{display:none}
+  .industry-icon{padding-top:3px}
+  .industry-icon svg{width:24px;height:24px}
+  .industry-detail{font-size:14px}
+}
+@media(prefers-reduced-motion:reduce){.industry,.industry-number,.industry-detail,.industry-arrow{transition:none}}

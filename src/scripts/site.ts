@@ -1,6 +1,8 @@
 import Lenis from 'lenis';
 import { initSignalTuner } from './signal-tuner';
 import { initResultsCounters } from './results-counters';
+import { initIndustries } from './industries';
+import { initProcess } from './process';
 
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 const fine = window.matchMedia('(hover: hover) and (pointer: fine)');
@@ -222,6 +224,8 @@ window.addEventListener('pagehide', stopScrollFrame);
 window.addEventListener('pageshow', () => { lenis?.start(); positionHero(); });
 initSignalTuner();
 initResultsCounters(reduced);
+initIndustries(reduced, fine);
+initProcess(reduced);
 document.querySelectorAll<HTMLElement>('.magnetic').forEach(button => {
   button.addEventListener('pointermove', event => {
     if (!fine.matches || reduced.matches) return;
@@ -250,7 +254,10 @@ document.querySelectorAll<HTMLFormElement>('[data-enquiry-form]').forEach(form =
     text.textContent = 'Sending…';
     message.hidden = true;
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 15000);
+    // Generous, because the server saves the lead and then waits on Gmail. Giving
+    // up at 15s showed an error for enquiries that had in fact arrived, and the
+    // visitor then either sent it twice or assumed we never got it.
+    const timeout = setTimeout(() => controller.abort(), 30000);
     try {
       const response = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' }, signal: controller.signal });
       if (!response.headers.get('content-type')?.includes('application/json')) throw new Error('The enquiry could not be sent. Please email info@clickfieldmedia.com or try again later.');
